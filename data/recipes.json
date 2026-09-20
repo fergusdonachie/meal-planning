@@ -6,8 +6,10 @@
     "fish": false,
     "title": "Lemon & Oregano Chicken Traybake",
     "blurb": "One roasting tin of chicken thighs, potatoes and lemon \u2014 skin crisps up, everything else looks after itself.",
+    "image": "images/med-chicken-traybake.jpg",
     "time": 35,
     "kcal": 480,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "One-pan"
@@ -38,8 +40,10 @@
     "fish": true,
     "title": "Baked Sea Bream with Fennel & Orange",
     "blurb": "Whole fish over shaved fennel and orange \u2014 bakes in one dish, tastes like a coastal holiday.",
+    "image": "images/med-sea-bream.jpg",
     "time": 30,
     "kcal": 420,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Whole fish"
@@ -67,8 +71,10 @@
     "fish": false,
     "title": "Shakshuka with Feta & Herbs",
     "blurb": "Eggs poached in a spiced tomato and pepper sauce \u2014 a fast, protein-rich dinner (or breakfast-for-dinner).",
+    "image": "images/med-shakshuka.jpg",
     "time": 20,
     "kcal": 380,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "One-pan",
@@ -100,8 +106,10 @@
     "fish": false,
     "title": "Lamb & Chickpea Kofta with Tzatziki",
     "blurb": "Spiced lamb skewers with a cooling cucumber-yoghurt sauce and a crunchy chopped salad.",
+    "image": "images/med-lamb-kofta.jpg",
     "time": 35,
     "kcal": 520,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "Grill"
@@ -132,8 +140,10 @@
     "fish": true,
     "title": "Tonno e Fagioli (White Bean & Tuna Salad)",
     "blurb": "A five-minute Italian pantry salad \u2014 good tinned tuna, cannellini beans, red onion and lemon.",
+    "image": "images/med-tonno-fagioli.jpg",
     "time": 15,
     "kcal": 410,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "No-cook",
@@ -162,8 +172,10 @@
     "fish": false,
     "title": "Roasted Vegetable, Chickpea & Halloumi Bowl",
     "blurb": "Traybake vegetables and chickpeas with griddled halloumi and a lemon-tahini drizzle.",
+    "image": "images/med-veg-halloumi-bowl.jpg",
     "time": 30,
     "kcal": 460,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "One-pan"
@@ -194,8 +206,10 @@
     "fish": false,
     "title": "Joojeh Kabab (Saffron-Lime Chicken Skewers)",
     "blurb": "Yoghurt-and-saffron marinated chicken, grilled until charred, with tomatoes and flatbread.",
+    "image": "images/per-joojeh.jpg",
     "time": 35,
     "kcal": 440,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Marinate ahead",
@@ -225,8 +239,10 @@
     "fish": false,
     "title": "Kuku Sabzi (Herb & Walnut Frittata)",
     "blurb": "A dense, deeply green herb frittata \u2014 parsley, coriander and dill baked with eggs and walnuts.",
+    "image": "images/per-kuku-sabzi.jpg",
     "time": 30,
     "kcal": 360,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Make-ahead"
@@ -255,8 +271,10 @@
     "fish": true,
     "title": "Persian-Spiced Salmon with Saffron & Barberries",
     "blurb": "Salmon fillets glazed with saffron and lime, finished with tart barberries and pistachio.",
+    "image": "images/per-salmon-saffron.jpg",
     "time": 25,
     "kcal": 450,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Under 30 min"
@@ -284,8 +302,10 @@
     "fish": false,
     "title": "Adas Polo-Style Lentil Rice with Spiced Beef",
     "blurb": "Basmati layered with spiced lentils, dates and crispy onions, topped with cinnamon-spiced ground beef.",
+    "image": "images/per-adas-polo.jpg",
     "time": 40,
     "kcal": 520,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "Batch-friendly"
@@ -318,8 +338,10 @@
     "fish": false,
     "title": "Herb & Bean Stew (Ghormeh Sabzi-Inspired, Chicken)",
     "blurb": "A lighter, chicken-based take on the classic herb stew \u2014 parsley, coriander, fenugreek and kidney beans.",
+    "image": "images/per-ghormeh-sabzi.jpg",
     "time": 45,
     "kcal": 430,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Make-ahead",
@@ -350,8 +372,10 @@
     "fish": true,
     "title": "Ginger-Scallion Steamed Sea Bass",
     "blurb": "Cantonese-style whole fish steamed until silky, topped with sizzling ginger and spring onion oil.",
+    "image": "images/asi-ginger-seabass.jpg",
     "time": 25,
     "kcal": 380,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Whole fish",
@@ -380,8 +404,10 @@
     "fish": true,
     "title": "Miso-Glazed Salmon with Sesame Greens",
     "blurb": "A sticky three-ingredient miso glaze under the grill, with quick sesame-garlic greens.",
+    "image": "images/asi-miso-salmon.jpg",
     "time": 20,
     "kcal": 460,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Under 20 min"
@@ -410,8 +436,10 @@
     "fish": false,
     "title": "Chicken & Vegetable Stir-Fry with Brown Rice",
     "blurb": "A everyday wok dinner \u2014 lean chicken, crunchy vegetables, a light garlic-ginger sauce.",
+    "image": "images/asi-chicken-stirfry.jpg",
     "time": 25,
     "kcal": 470,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "One-pan"
@@ -442,8 +470,10 @@
     "fish": false,
     "title": "Beef & Broccoli Lettuce Wraps",
     "blurb": "Quick stir-fried beef and broccoli in a light sauce, wrapped in crisp lettuce instead of rice.",
+    "image": "images/asi-beef-lettuce-wraps.jpg",
     "time": 25,
     "kcal": 430,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "Under 30 min"
@@ -473,8 +503,10 @@
     "fish": false,
     "title": "Tofu & Vegetable Red Curry",
     "blurb": "A fresh Thai-style curry \u2014 coconut milk, red curry paste, firm tofu and whatever vegetables are in the fridge.",
+    "image": "images/asi-tofu-curry.jpg",
     "time": 30,
     "kcal": 420,
+    "servings": 2,
     "spice": 2,
     "tags": [
       "One-pan"
@@ -504,8 +536,10 @@
     "fish": false,
     "title": "Thai Chicken Larb Salad",
     "blurb": "Minced chicken tossed with lime, fish sauce, chilli, mint and toasted rice powder \u2014 bright and light.",
+    "image": "images/asi-larb.jpg",
     "time": 20,
     "kcal": 380,
+    "servings": 2,
     "spice": 2,
     "tags": [
       "Under 20 min",
@@ -535,8 +569,10 @@
     "fish": true,
     "title": "Vietnamese Turmeric Fish with Dill (Cha Ca)",
     "blurb": "Firm white fish pan-fried with turmeric and dill, finished with peanuts and fresh herbs over rice noodles.",
+    "image": "images/asi-cha-ca.jpg",
     "time": 25,
     "kcal": 420,
+    "servings": 2,
     "spice": 0,
     "tags": [
       "Under 30 min"
@@ -567,8 +603,10 @@
     "fish": true,
     "title": "Grilled Fish Tacos with Cabbage Slaw",
     "blurb": "Charred spiced white fish, crunchy lime slaw and a light yoghurt crema in warm corn tortillas.",
+    "image": "images/mex-fish-tacos.jpg",
     "time": 30,
     "kcal": 460,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "Grill"
@@ -599,8 +637,10 @@
     "fish": false,
     "title": "Chicken Tinga Lettuce & Corn Cups",
     "blurb": "Shredded chicken simmered in a smoky chipotle-tomato sauce \u2014 served in lettuce or warm tortillas.",
+    "image": "images/mex-chicken-tinga.jpg",
     "time": 35,
     "kcal": 440,
+    "servings": 2,
     "spice": 2,
     "tags": [
       "Batch-friendly"
@@ -630,8 +670,10 @@
     "fish": false,
     "title": "Black Bean & Sweet Potato Tacos",
     "blurb": "Roasted spiced sweet potato and black beans, lime crema and pickled red onion in soft tortillas.",
+    "image": "images/mex-blackbean-sweetpotato.jpg",
     "time": 30,
     "kcal": 430,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "One-pan"
@@ -662,8 +704,10 @@
     "fish": false,
     "title": "Carne Asada with Pico de Gallo & Charred Corn",
     "blurb": "Citrus-marinated grilled steak, sliced thin, with a fresh tomato-lime salsa and blackened corn.",
+    "image": "images/mex-carne-asada.jpg",
     "time": 25,
     "kcal": 490,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "Marinate ahead",
@@ -694,8 +738,10 @@
     "fish": true,
     "title": "Shrimp & Avocado Ceviche",
     "blurb": "Prawns and citrus juice 'cook' together with tomato, chilli and avocado \u2014 no stove needed.",
+    "image": "images/mex-ceviche.jpg",
     "time": 20,
     "kcal": 320,
+    "servings": 2,
     "spice": 1,
     "tags": [
       "No-cook",
@@ -726,8 +772,10 @@
     "fish": false,
     "title": "Chipotle Chicken & Vegetable Skewers",
     "blurb": "Smoky marinated chicken and peppers on the grill, finished with lime and a scatter of coriander.",
+    "image": "images/mex-chipotle-chicken.jpg",
     "time": 30,
     "kcal": 440,
+    "servings": 2,
     "spice": 2,
     "tags": [
       "Marinate ahead",
