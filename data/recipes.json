@@ -8,7 +8,7 @@
     "blurb": "One roasting tin of chicken thighs, potatoes and lemon \u2014 skin crisps up, everything else looks after itself.",
     "image": "images/med-chicken-traybake.jpg",
     "time": 35,
-    "kcal": 480,
+    "kcal": 500,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -23,14 +23,16 @@
       "1 tbsp olive oil",
       "1 tsp dried oregano",
       "75g Kalamata olives",
-      "Small handful fresh parsley"
+      "Small handful fresh parsley",
+      "60g mixed salad leaves, to serve"
     ],
     "method": [
       "Heat oven to 200\u00b0C.",
       "Toss potatoes, onion and garlic with half the oil in a roasting tin; roast 15 min.",
       "Add chicken thighs, remaining oil, oregano, salt and pepper, and lemon wedges. Toss to coat.",
       "Roast 30\u201335 min until chicken is golden and potatoes are tender.",
-      "Scatter with olives and parsley before serving."
+      "Scatter with olives and parsley before serving.",
+      "Serve with a simple green salad."
     ]
   },
   {
@@ -41,8 +43,8 @@
     "title": "Baked Sea Bream with Fennel & Orange",
     "blurb": "Whole fish over shaved fennel and orange \u2014 bakes in one dish, tastes like a coastal holiday.",
     "image": "images/med-sea-bream.jpg",
-    "time": 30,
-    "kcal": 420,
+    "time": 35,
+    "kcal": 560,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -50,18 +52,22 @@
     ],
     "ingredients": [
       "1 whole sea bream, gutted and scaled",
+      "300g baby new potatoes, halved",
       "1/2 fennel bulb, thinly sliced",
       "1/2 orange, half sliced / half juiced",
       "1 tbsp olive oil",
       "2 garlic cloves, sliced",
       "Small handful fresh dill",
-      "Sea salt and black pepper"
+      "Sea salt and black pepper",
+      "60g rocket or mixed salad leaves, to serve"
     ],
     "method": [
-      "Heat oven to 200\u00b0C. Toss fennel with half the oil and a pinch of salt in a baking dish.",
+      "Heat oven to 200\u00b0C. Parboil the potatoes 8 min until just tender; drain.",
+      "Toss fennel and potatoes with half the oil and a pinch of salt in a baking dish.",
       "Score the fish 2\u20133 times each side; stuff cavities with orange slices, garlic and dill.",
-      "Lay fish over the fennel, drizzle with remaining oil and orange juice.",
-      "Bake 20\u201325 min until the flesh flakes easily."
+      "Lay fish over the fennel and potatoes, drizzle with remaining oil and orange juice.",
+      "Bake 25\u201330 min until the fish flakes easily and potatoes are tender.",
+      "Serve with rocket or salad leaves."
     ]
   },
   {
@@ -73,7 +79,7 @@
     "blurb": "Eggs poached in a spiced tomato and pepper sauce \u2014 a fast, protein-rich dinner (or breakfast-for-dinner).",
     "image": "images/med-shakshuka.jpg",
     "time": 20,
-    "kcal": 380,
+    "kcal": 460,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -90,13 +96,15 @@
       "1/2 x 400g tin chopped tomatoes",
       "3 eggs",
       "40g feta, crumbled",
-      "Fresh parsley or coriander"
+      "Fresh parsley or coriander",
+      "4 slices crusty bread, to serve"
     ],
     "method": [
       "Soften onion and pepper in oil, 6\u20137 min. Add garlic and spices, cook 1 min.",
       "Pour in tomatoes, simmer 8 min until thickened.",
       "Make three wells in the sauce, crack in eggs, cover and cook 6\u20138 min until whites are set.",
-      "Scatter with feta and herbs."
+      "Scatter with feta and herbs.",
+      "Serve with warm crusty bread for dipping."
     ]
   },
   {
@@ -108,7 +116,7 @@
     "blurb": "Spiced lamb skewers with a cooling cucumber-yoghurt sauce and a crunchy chopped salad.",
     "image": "images/med-lamb-kofta.jpg",
     "time": 35,
-    "kcal": 520,
+    "kcal": 600,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -124,13 +132,15 @@
       "1/4 cucumber, grated",
       "1 garlic clove",
       "Mint leaves",
-      "Mixed salad leaves and tomatoes"
+      "Mixed salad leaves and tomatoes",
+      "2 wholemeal pittas"
     ],
     "method": [
       "Mix lamb, mashed chickpeas, spices, onion and seasoning; shape onto skewers.",
       "Grill or pan-fry 10\u201312 min, turning, until cooked through.",
       "Stir grated cucumber (squeezed dry), garlic and mint into yoghurt for tzatziki.",
-      "Serve with the salad."
+      "Warm the pittas.",
+      "Serve with the salad and warmed pittas."
     ]
   },
   {
@@ -142,7 +152,7 @@
     "blurb": "A five-minute Italian pantry salad \u2014 good tinned tuna, cannellini beans, red onion and lemon.",
     "image": "images/med-tonno-fagioli.jpg",
     "time": 15,
-    "kcal": 410,
+    "kcal": 470,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -157,12 +167,13 @@
       "1/2 lemon, juiced",
       "Small handful flat-leaf parsley",
       "Cherry tomatoes",
-      "Rocket, to serve"
+      "Rocket, to serve",
+      "2 slices crusty bread"
     ],
     "method": [
       "Soak sliced onion in the lemon juice for 10 min to mellow it.",
       "Toss beans, tuna (with its oil), onion, lemon juice, olive oil and parsley.",
-      "Season well and serve over rocket with tomatoes."
+      "Season well and serve over rocket with tomatoes and crusty bread."
     ]
   },
   {
@@ -174,11 +185,11 @@
     "blurb": "Traybake vegetables and chickpeas with griddled halloumi and a lemon-tahini drizzle.",
     "image": "images/med-veg-halloumi-bowl.jpg",
     "time": 30,
-    "kcal": 460,
+    "kcal": 580,
     "servings": 2,
     "spice": 0,
     "tags": [
-      "One-pan"
+      "Traybake"
     ],
     "ingredients": [
       "1/2 aubergine, cubed",
@@ -187,6 +198,7 @@
       "1/2 x 400g tin chickpeas, drained",
       "1 tbsp olive oil",
       "1/2 tsp cumin",
+      "60g couscous",
       "110g halloumi, sliced",
       "1 tbsp tahini",
       "1/2 lemon, juiced",
@@ -194,9 +206,10 @@
     ],
     "method": [
       "Heat oven to 200\u00b0C. Toss vegetables and chickpeas with oil and cumin; roast 25 min.",
+      "Meanwhile cook the couscous according to packet instructions; fluff with a fork.",
       "Griddle halloumi slices 2 min per side until golden.",
       "Whisk tahini with lemon juice and a splash of water to a drizzling consistency.",
-      "Assemble bowls and drizzle over."
+      "Assemble bowls over the couscous and drizzle over."
     ]
   },
   {
@@ -207,8 +220,8 @@
     "title": "Joojeh Kabab (Saffron-Lime Chicken Skewers)",
     "blurb": "Yoghurt-and-saffron marinated chicken, grilled until charred, with tomatoes and flatbread.",
     "image": "images/per-joojeh.jpg",
-    "time": 35,
-    "kcal": 440,
+    "time": 40,
+    "kcal": 560,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -222,14 +235,17 @@
       "1/2 onion, grated",
       "1 tbsp lemon or lime juice",
       "1 tbsp olive oil",
+      "150g basmati rice",
       "Vine tomatoes",
-      "Wholemeal flatbread"
+      "1/2 cucumber, diced",
+      "1 wholemeal flatbread, warmed"
     ],
     "method": [
       "Mix yoghurt, saffron water, grated onion, citrus juice and oil; marinate chicken at least 2 hours (or overnight).",
       "Thread onto skewers with tomatoes.",
-      "Grill or griddle 12\u201315 min, turning, until charred and cooked through.",
-      "Serve with flatbread and a green salad."
+      "Cook the rice according to packet instructions.",
+      "Grill or griddle skewers 12\u201315 min, turning, until charred and cooked through.",
+      "Serve over rice with the warmed flatbread and diced cucumber."
     ]
   },
   {
@@ -241,7 +257,7 @@
     "blurb": "A dense, deeply green herb frittata \u2014 parsley, coriander and dill baked with eggs and walnuts.",
     "image": "images/per-kuku-sabzi.jpg",
     "time": 30,
-    "kcal": 360,
+    "kcal": 460,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -255,13 +271,17 @@
       "2 spring onions, sliced",
       "25g walnuts, chopped",
       "1/2 tsp turmeric",
-      "1 tbsp olive oil"
+      "1 tbsp olive oil",
+      "2 wholemeal flatbreads, warmed",
+      "100g Greek yoghurt",
+      "Sliced tomatoes and cucumber, to serve"
     ],
     "method": [
       "Heat oven to 180\u00b0C. Whisk eggs with turmeric and seasoning.",
       "Stir in all the chopped herbs, spring onion and walnuts.",
       "Pour into an oiled ovenproof pan, bake 22\u201325 min until just set.",
-      "Cool slightly and cut into wedges; good warm or cold."
+      "Cool slightly and cut into wedges; good warm or cold.",
+      "Serve with warmed flatbread, yoghurt and sliced tomatoes and cucumber."
     ]
   },
   {
@@ -272,8 +292,8 @@
     "title": "Persian-Spiced Salmon with Saffron & Barberries",
     "blurb": "Salmon fillets glazed with saffron and lime, finished with tart barberries and pistachio.",
     "image": "images/per-salmon-saffron.jpg",
-    "time": 25,
-    "kcal": 450,
+    "time": 30,
+    "kcal": 560,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -286,13 +306,16 @@
       "1/2 tbsp lime juice",
       "1 tbsp dried barberries (or dried cranberries)",
       "1 tbsp pistachios, chopped",
-      "Steamed basmati rice, to serve"
+      "150g basmati rice",
+      "100g green beans"
     ],
     "method": [
+      "Cook the rice according to packet instructions.",
       "Mix saffron water, oil and lime juice; brush over salmon.",
       "Pan-fry or bake fillets 8\u201310 min until just cooked.",
+      "Meanwhile steam the green beans 4\u20135 min until just tender.",
       "Soak barberries in warm water 5 min, drain, and scatter over with pistachios.",
-      "Serve over rice."
+      "Serve salmon and green beans over the rice."
     ]
   },
   {
@@ -304,7 +327,7 @@
     "blurb": "Basmati layered with spiced lentils, dates and crispy onions, topped with cinnamon-spiced ground beef.",
     "image": "images/per-adas-polo.jpg",
     "time": 40,
-    "kcal": 520,
+    "kcal": 540,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -320,7 +343,8 @@
       "1/4 tsp allspice",
       "2 dates, chopped",
       "1 tbsp olive oil",
-      "Raisins, a small handful"
+      "Raisins, a small handful",
+      "Sliced cucumber and tomato, to serve"
     ],
     "method": [
       "Cook lentils in salted water 15\u201318 min until just tender; drain.",
@@ -328,7 +352,7 @@
       "Fry sliced onion in 1 tbsp oil until deep golden and crisp; set aside.",
       "Brown beef with diced onion and spices, 8\u201310 min.",
       "Layer rice and lentils in a pan with remaining oil, dates and raisins; steam 15 min on low heat, lid wrapped in a tea towel.",
-      "Serve topped with beef and crispy onions."
+      "Serve topped with beef and crispy onions, with sliced cucumber and tomato alongside."
     ]
   },
   {
@@ -340,7 +364,7 @@
     "blurb": "A lighter, chicken-based take on the classic herb stew \u2014 parsley, coriander, fenugreek and kidney beans.",
     "image": "images/per-ghormeh-sabzi.jpg",
     "time": 45,
-    "kcal": 430,
+    "kcal": 560,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -356,12 +380,13 @@
       "1/2 x 400g tin red kidney beans, drained",
       "1 tbsp olive oil",
       "1 dried lime (or 1 tbsp lime juice)",
-      "Basmati rice, to serve"
+      "150g basmati rice"
     ],
     "method": [
       "Fry onion in oil until soft; add chicken and brown lightly.",
       "Add chopped herbs and fenugreek, cook 5 min to soften.",
       "Add kidney beans, dried limes (pierced) and enough water to just cover; simmer, covered, 30\u201335 min.",
+      "Meanwhile cook the rice according to packet instructions.",
       "Season to taste and serve over rice."
     ]
   },
@@ -373,8 +398,8 @@
     "title": "Ginger-Scallion Steamed Sea Bass",
     "blurb": "Cantonese-style whole fish steamed until silky, topped with sizzling ginger and spring onion oil.",
     "image": "images/asi-ginger-seabass.jpg",
-    "time": 25,
-    "kcal": 380,
+    "time": 30,
+    "kcal": 520,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -388,13 +413,16 @@
       "1 tbsp light soy sauce",
       "1/2 tbsp Shaoxing wine (optional)",
       "1 tbsp vegetable oil",
-      "Steamed rice and greens, to serve"
+      "150g jasmine rice",
+      "150g pak choi or Chinese greens"
     ],
     "method": [
+      "Cook the rice according to packet instructions.",
       "Score the fish, place on a heatproof plate with half the ginger inside the cavity.",
-      "Steam over boiling water 10\u201312 min until just cooked.",
+      "Steam over boiling water 10\u201312 min until just cooked, steaming or stir-frying the greens alongside for the last 3\u20134 min.",
       "Scatter remaining ginger and spring onion over the fish; pour over soy sauce and wine.",
-      "Heat oil until smoking and pour over to sizzle."
+      "Heat oil until smoking and pour over to sizzle.",
+      "Serve over rice with the greens."
     ]
   },
   {
@@ -405,8 +433,8 @@
     "title": "Miso-Glazed Salmon with Sesame Greens",
     "blurb": "A sticky three-ingredient miso glaze under the grill, with quick sesame-garlic greens.",
     "image": "images/asi-miso-salmon.jpg",
-    "time": 20,
-    "kcal": 460,
+    "time": 25,
+    "kcal": 560,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -420,13 +448,15 @@
       "150g pak choi or tenderstem broccoli",
       "1/2 tsp sesame oil",
       "1 garlic clove, sliced",
-      "Sesame seeds"
+      "Sesame seeds",
+      "150g jasmine or brown rice"
     ],
     "method": [
+      "Cook the rice according to packet instructions.",
       "Mix miso, honey and vinegar; spread over salmon and marinate 10 min if time allows.",
       "Grill salmon 8\u201310 min until glazed and cooked through.",
       "Stir-fry greens with garlic and sesame oil 3\u20134 min.",
-      "Serve together, scattered with sesame seeds."
+      "Serve together over rice, scattered with sesame seeds."
     ]
   },
   {
@@ -437,8 +467,8 @@
     "title": "Chicken & Vegetable Stir-Fry with Brown Rice",
     "blurb": "A everyday wok dinner \u2014 lean chicken, crunchy vegetables, a light garlic-ginger sauce.",
     "image": "images/asi-chicken-stirfry.jpg",
-    "time": 25,
-    "kcal": 470,
+    "time": 30,
+    "kcal": 560,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -454,9 +484,10 @@
       "1 tbsp low-salt soy sauce",
       "1/2 tbsp oyster sauce",
       "1/2 tbsp vegetable oil",
-      "Brown rice, to serve"
+      "150g brown rice"
     ],
     "method": [
+      "Cook the rice according to packet instructions.",
       "Stir-fry chicken in hot oil until golden, 5\u20136 min; set aside.",
       "Stir-fry vegetables 3\u20134 min until just tender-crisp.",
       "Return chicken, add ginger, garlic, soy and oyster sauce; toss 1\u20132 min.",
@@ -504,8 +535,8 @@
     "title": "Tofu & Vegetable Red Curry",
     "blurb": "A fresh Thai-style curry \u2014 coconut milk, red curry paste, firm tofu and whatever vegetables are in the fridge.",
     "image": "images/asi-tofu-curry.jpg",
-    "time": 30,
-    "kcal": 420,
+    "time": 35,
+    "kcal": 520,
     "servings": 2,
     "spice": 2,
     "tags": [
@@ -520,9 +551,10 @@
       "1/2 tbsp fish sauce (or soy for vegetarian)",
       "1/2 lime, juiced",
       "Thai basil or coriander",
-      "Jasmine rice, to serve"
+      "150g jasmine rice"
     ],
     "method": [
+      "Cook the rice according to packet instructions.",
       "Fry curry paste in a dry pan 1 min until fragrant, then stir in coconut milk.",
       "Add pepper and green beans, simmer 8 min.",
       "Add tofu, fish sauce and lime juice, simmer 5 min more.",
@@ -538,7 +570,7 @@
     "blurb": "Minced chicken tossed with lime, fish sauce, chilli, mint and toasted rice powder \u2014 bright and light.",
     "image": "images/asi-larb.jpg",
     "time": 20,
-    "kcal": 380,
+    "kcal": 400,
     "servings": 2,
     "spice": 2,
     "tags": [
@@ -553,13 +585,14 @@
       "1/2 red chilli, sliced",
       "1 shallot, thinly sliced",
       "Mint and coriander leaves",
-      "Little gem lettuce leaves, to serve"
+      "Little gem lettuce leaves, to serve",
+      "Cucumber slices, to serve"
     ],
     "method": [
       "Dry-fry chicken mince in a hot pan, breaking it up, until cooked, 6\u20138 min.",
       "Off the heat, stir in fish sauce, lime juice, chilli and shallots.",
       "Toss through herbs and rice powder just before serving.",
-      "Serve in lettuce cups."
+      "Serve in lettuce cups with cucumber slices."
     ]
   },
   {
@@ -570,8 +603,8 @@
     "title": "Vietnamese Turmeric Fish with Dill (Cha Ca)",
     "blurb": "Firm white fish pan-fried with turmeric and dill, finished with peanuts and fresh herbs over rice noodles.",
     "image": "images/asi-cha-ca.jpg",
-    "time": 25,
-    "kcal": 420,
+    "time": 30,
+    "kcal": 520,
     "servings": 2,
     "spice": 0,
     "tags": [
@@ -586,14 +619,17 @@
       "2 spring onions, sliced",
       "1/2 tbsp fish sauce",
       "1/2 tbsp vegetable oil",
-      "Rice noodles, to serve",
+      "150g rice noodles",
+      "50g beansprouts",
+      "Lettuce leaves, to serve",
       "Crushed peanuts"
     ],
     "method": [
       "Marinate fish with turmeric, ginger, garlic and fish sauce for 15 min.",
+      "Cook the rice noodles according to packet instructions; drain.",
       "Pan-fry fish in oil 3\u20134 min until nearly cooked.",
       "Add spring onion and dill, toss 1\u20132 min until fish is just done.",
-      "Serve over rice noodles, scattered with peanuts."
+      "Serve over rice noodles with beansprouts and lettuce leaves, scattered with peanuts."
     ]
   },
   {
@@ -639,7 +675,7 @@
     "blurb": "Shredded chicken simmered in a smoky chipotle-tomato sauce \u2014 served in lettuce or warm tortillas.",
     "image": "images/mex-chicken-tinga.jpg",
     "time": 35,
-    "kcal": 440,
+    "kcal": 520,
     "servings": 2,
     "spice": 2,
     "tags": [
@@ -653,14 +689,15 @@
       "1 chipotle chilli in adobo, chopped",
       "1/2 tsp cumin",
       "1/2 tbsp olive oil",
-      "Little gem lettuce or small corn tortillas",
+      "4 small corn tortillas (or lettuce cups)",
+      "80g cooked black beans, warmed",
       "Sliced avocado and coriander"
     ],
     "method": [
       "Poach chicken in water until cooked, 12\u201315 min; shred with two forks.",
       "Soften onion and garlic in oil, add tomatoes, chipotle and cumin, simmer 10 min.",
       "Stir in shredded chicken, simmer 5 min more to absorb the sauce.",
-      "Serve in lettuce cups or tortillas with avocado."
+      "Serve in lettuce cups or tortillas with avocado and warmed black beans."
     ]
   },
   {
@@ -705,8 +742,8 @@
     "title": "Carne Asada with Pico de Gallo & Charred Corn",
     "blurb": "Citrus-marinated grilled steak, sliced thin, with a fresh tomato-lime salsa and blackened corn.",
     "image": "images/mex-carne-asada.jpg",
-    "time": 25,
-    "kcal": 490,
+    "time": 30,
+    "kcal": 570,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -722,13 +759,14 @@
       "1/4 red onion, finely diced",
       "1/2 jalape\u00f1o, diced",
       "Coriander",
-      "1 corn cob"
+      "1 corn cob",
+      "4 small corn tortillas, warmed"
     ],
     "method": [
       "Marinate steak in lime juice, garlic, cumin and a little oil for 30 min to overnight.",
       "Mix tomatoes, onion, jalape\u00f1o, coriander and a squeeze of lime for pico de gallo.",
       "Grill steak 3\u20134 min per side (medium), rest 5 min, then slice thinly against the grain.",
-      "Char corn on the grill or a dry pan; serve alongside."
+      "Char corn on the grill or a dry pan; serve alongside with warmed tortillas."
     ]
   },
   {
@@ -740,7 +778,7 @@
     "blurb": "Prawns and citrus juice 'cook' together with tomato, chilli and avocado \u2014 no stove needed.",
     "image": "images/mex-ceviche.jpg",
     "time": 20,
-    "kcal": 320,
+    "kcal": 380,
     "servings": 2,
     "spice": 1,
     "tags": [
@@ -756,7 +794,7 @@
       "1/2 jalape\u00f1o, diced",
       "1/2 avocado, diced",
       "Coriander",
-      "Tortilla chips or tostadas, to serve"
+      "40g tortilla chips (or 4 tostadas)"
     ],
     "method": [
       "Cover chopped prawns in lime and lemon juice; chill 15\u201320 min until opaque ('cooked' by the acid).",
@@ -773,8 +811,8 @@
     "title": "Chipotle Chicken & Vegetable Skewers",
     "blurb": "Smoky marinated chicken and peppers on the grill, finished with lime and a scatter of coriander.",
     "image": "images/mex-chipotle-chicken.jpg",
-    "time": 30,
-    "kcal": 440,
+    "time": 35,
+    "kcal": 560,
     "servings": 2,
     "spice": 2,
     "tags": [
@@ -790,13 +828,15 @@
       "1/2 red pepper, chunked",
       "1/2 yellow pepper, chunked",
       "1/2 red onion, chunked",
-      "Coriander"
+      "Coriander",
+      "150g basmati or jasmine rice"
     ],
     "method": [
+      "Cook the rice according to packet instructions.",
       "Marinate chicken in chipotle, lime juice, oil and cumin for at least 20 min.",
       "Thread chicken and vegetables onto skewers.",
       "Grill 12\u201314 min, turning, until charred and cooked through.",
-      "Finish with a squeeze of lime and coriander."
+      "Finish with a squeeze of lime and coriander, and serve over rice."
     ]
   }
 ]

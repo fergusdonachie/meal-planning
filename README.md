@@ -14,7 +14,7 @@ A recipe bank for weekly menu and grocery planning: fresh, from-scratch dinners 
 ## Recipe mix
 
 - 24 recipes: 8 fish, 7 chicken, 4 red meat, 5 vegetarian
-- Mostly 20–35 minutes, 320–520 kcal per serving, serves 2
+- Mostly 15–45 minutes, 380–600 kcal per serving, serves 2 — each recipe is a full plate (protein + carb/starch + vegetables), not just the protein component
 - No ultra-processed ingredients — tinned beans/tomatoes/tuna and good pantry staples only, no jarred sauces or stock cubes
 
 ## Recipe data schema (`data/recipes.json`)
