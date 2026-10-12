@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Weekly Table</title><link rel="stylesheet" href="panel.css"></head>
+<body>
+<header><p class="eyebrow">Morrisons companion</p><h1>The Weekly Table</h1><p>Shop your weekly ingredients alongside Morrisons.</p></header>
+<section class="import-tools" aria-label="Import shopping list">
+  <button id="open-planner">Open meal planner</button>
+  <label class="file-button">Import shopping-list file<input id="import-file" type="file" accept=".json,application/json"></label>
+  <p class="hint">In your meal planner, open the shopping list and choose “Send to Morrisons extension”.</p>
+</section>
+<p id="status" role="status" aria-live="polite"></p>
+<p id="progress"></p>
+<section id="shopping" hidden>
+ <label for="ingredient">Ingredient to shop for</label><select id="ingredient"></select>
+ <p id="required" class="required"></p>
+ <form id="search-form"><label for="query">Morrisons search</label><div class="search"><input id="query" maxlength="300" required><button type="submit">Search</button></div></form>
+ <div id="preferred"></div>
+ <button id="scan" class="primary">Read products on this page</button>
+ <p class="hint">Log into Morrisons and select your delivery address/slot first. “Add available” describes the page now; Morrisons confirms final delivery availability.</p>
+ <div id="results"></div>
+ <h2>Your ingredient checklist</h2><div id="checklist"></div>
+</section>
+<footer><button id="clear-list" class="quiet">Clear imported list</button><p>Stored in this browser only. No grocery API fees, password collection or automatic checkout.</p></footer>
+<script type="module" src="panel.js"></script>
+</body></html>

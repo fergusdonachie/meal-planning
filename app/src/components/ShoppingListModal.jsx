@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useShopping } from "../context/ShoppingContext";
 import { CUISINE_COLOR } from "../lib/constants";
 import { ingredientKey, prepareShoppingList } from "../lib/shoppingList";
+import { extensionShoppingList, sendShoppingListToExtension, downloadShoppingList } from "../lib/extensionExport";
 
 const PANTRY_KEY = "weeklyTablePantryExcluded";
 function loadExcluded() {
@@ -17,9 +18,10 @@ export default function ShoppingListModal({ recipes, onClose }) {
   const [view, setView] = useState("combined");
   const [status, setStatus] = useState("");
   const [manualCopy, setManualCopy] = useState(false);
+  const [sending, setSending] = useState(false);
   const modalRef = useRef(null);
   const copyRef = useRef(null);
-  const { items, remaining, combined, allSections, text } = prepareShoppingList(recipes, selected, excluded, view);
+  const { items, remaining, combined, sections, allSections, text } = prepareShoppingList(recipes, selected, excluded, view);
 
   useEffect(() => {
     try { localStorage.setItem(PANTRY_KEY, JSON.stringify([...excluded])); } catch { /* Storage may be unavailable. */ }
@@ -100,6 +102,17 @@ export default function ShoppingListModal({ recipes, onClose }) {
     }
   }
 
+  async function sendToExtension() {
+    if (sending) return;
+    setSending(true);
+    try {
+      const result = await sendShoppingListToExtension(extensionShoppingList(sections));
+      setStatus(result.ok ? `${result.count} ingredients sent. Open the extension from your browser toolbar, then shop in Morrisons.` : result.error || "The extension could not import the list.");
+    } catch {
+      setStatus("The extension could not import the list. Try the shopping-list file instead.");
+    } finally { setSending(false); }
+  }
+
   return (
     <div className="modal-overlay open" onClick={(event) => event.target === event.currentTarget && onClose()}>
       <div className="modal" ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="shopping-title">
@@ -114,6 +127,16 @@ export default function ShoppingListModal({ recipes, onClose }) {
               <button type="button" className="addbtn" disabled={!remaining} onClick={copyList}>Copy shopping list</button>
               <button type="button" className="addbtn" disabled={!remaining} onClick={shareList}>Share list</button>
               <a href="https://groceries.morrisons.com/" target="_blank" rel="noopener noreferrer">Open Morrisons ↗</a>
+            </div>
+          </div>
+          <div className="extension-handoff">
+            <h3>Shop with the Morrisons browser companion</h3>
+            <p>On a laptop or PC, send the combined list to the extension to choose products, save favourites and read current product details.</p>
+            <div className="shopping-actions">
+              <button type="button" className="addbtn" disabled={!remaining || sending} onClick={sendToExtension}>{sending ? "Sending…" : "Send to Morrisons extension"}</button>
+              <button type="button" className="addbtn" disabled={!remaining} onClick={() => downloadShoppingList(extensionShoppingList(sections))}>Shopping-list file</button>
+              <a href="/downloads/weekly-table-morrisons.zip" download>Download extension ↧</a>
+              <a href="/downloads/morrisons-extension-setup.txt" target="_blank" rel="noopener noreferrer">Setup instructions ↗</a>
             </div>
           </div>
           <p className="shopping-status" role="status">{status}</p>

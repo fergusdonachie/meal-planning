@@ -31,6 +31,16 @@ Production and Preview. See `../docs/private-access.md` for the full setup and
 verification steps. Missing configuration blocks access. Local Vite development
 does not run the Vercel password gate. Pepesto is not connected yet.
 
+## Morrisons desktop browser companion
+
+The shopping modal can send its combined, pantry-filtered ingredient list to the
+Chrome/Edge companion in `../extension/`. It reads current Morrisons product cards,
+saves preferred products and offers a reviewed one-pack Add action. It does not
+perform checkout or require Pepesto. The ZIP and guide are served under
+`/downloads/`, behind the app password. See `../extension/README.md` for install
+steps and current limitations. Package changes with
+`python3 scripts/package_extension.py` before building or deploying.
+
 ## Shopping and photos
 
 The shopping modal saves pantry exclusions and offers copy/share controls plus a link to Morrisons. It does not add products to a retailer basket. See `../docs/morrisons.md` for the integration research. The shopping list opens in a combined view, adding repeated ingredients and converting compatible metric/spoon units. It groups items into supermarket sections (produce, meat, fish, dairy, bakery, frozen and cupboard staples); copy/share includes the same section headings. This is a general supermarket order, not the exact layout of a particular Morrisons store. A By recipe view preserves the original breakdown. Different measures are shown together without converting weight to volume; alternatives and unclear quantities remain explicit. Copy/share follows the selected view, and pantry exclusions apply to both.

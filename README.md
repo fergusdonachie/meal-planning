@@ -13,6 +13,8 @@ A recipe bank for weekly menu and grocery planning: fresh, from-scratch dinners 
 - `scripts/sync_recipes.py` — validates recipe data and updates the standalone page.
 - `docs/morrisons.md` — basket integration research and next prototype requirements.
 - `docs/private-access.md` — shared-password setup and weekly cooking features.
+- `extension/` — a Chrome/Edge Morrisons shopping companion with local product preferences.
+- `scripts/package_extension.py` — packages the companion and its guide for download from the private app.
 
 ## Recipe mix
 

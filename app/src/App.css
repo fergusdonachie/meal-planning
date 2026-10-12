@@ -551,6 +551,9 @@ header.top {
 .recipe-note { color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
 .shopping-handoff { background: var(--olive-soft); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
 .shopping-handoff h3 { margin: 0 0 6px; font-size: 18px; }
+.extension-handoff { border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-top: 12px; }
+.extension-handoff h3 { margin: 0 0 6px; font-size: 18px; }
+.extension-handoff p { margin: 0 0 12px; color: var(--ink-soft); line-height: 1.5; }
 .shopping-handoff p { margin: 0 0 12px; color: var(--ink-soft); line-height: 1.5; }
 .shopping-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .shopping-actions a { font-weight: 600; padding: 8px 0; }
