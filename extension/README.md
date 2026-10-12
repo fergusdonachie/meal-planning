@@ -25,57 +25,57 @@ This package is for a desktop browser; it is not an iPhone extension.
    shopping-list JSON file and use Import shopping-list file in the side panel.
 3. Log into Morrisons as usual and select your delivery address and slot. The
    companion never asks for or stores your Morrisons password or session cookies.
-4. Select an ingredient in the companion, edit the search words if necessary,
-   and click Search. Morrisons opens its normal results page.
-5. Click Read products on this page after the results have loaded. You will see
-   product names (including brands when present in the name), pack sizes, prices,
-   offers and whether a supported Add button is available on that page.
-6. Click Use this product to remember a preferred product for that ingredient.
-   The saved choice is a dated snapshot. Find saved product opens a new search;
-   refresh to read its current price and availability.
-7. Review the product and quantity. Add 1 pack in Morrisons requests exactly one
-   click on that product's enabled Add button. Check the Morrisons page/basket for
-   login prompts and confirmation. Choose any additional quantity using Morrisons'
-   own controls, then tick the ingredient off in the companion.
-8. Complete your delivery order directly in Morrisons. The extension does not
-   book slots, place orders or handle payment.
+4. Click Find products for the whole list. Keep the new Morrisons tab selected.
+   The companion searches every unchecked ingredient, scrolls the results, and
+   retains products even if the website removes cards that move off screen.
+5. Review the proposed basket once. Each ingredient has a proposed product,
+   pack count and alternative matches in a dropdown. Saved choices are preferred
+   when still compatible and available. Otherwise the matcher favours measurable
+   packs and economical totals, excluding obvious prepared-food mismatches.
+6. Check any estimated pack counts: counts versus weights, bunches and other
+   unclear measures cannot always be converted. Missing matches require a manual
+   choice or adjusted search. This is a rule-based matcher, not a guarantee of
+   dietary suitability; inspect product details when necessary.
+7. Click Add the reviewed proposed basket. A dedicated Morrisons tab searches
+   each chosen product and adds enough packs to meet the reviewed totals.
+8. Check the full Morrisons trolley, quantities and total, then complete your
+   delivery order yourself. The extension does not book slots or handle payment.
 
-## Add the whole shopping list (version 0.2)
+## Batch behaviour (version 0.3)
 
-1. Save a preferred product for each remaining ingredient with Use this product.
-   A manual Add action now also remembers that product choice. Products are never
-   silently substituted when a saved choice cannot be found.
-2. Click Review full shopping list. Any ingredients without a product are listed
-   for you to choose first. Review every pack total; enter counts where the
-   ingredient units cannot be converted. Duplicate choices of the same product
-   become one line, with comparable quantities combined before rounding.
-3. Click Add reviewed shopping list to basket. A dedicated Morrisons tab opens and
-   searches each exact saved product in turn. Keep that tab selected while it runs.
-   This uses your existing Morrisons login/address session.
-4. The batch checks the product counter and increases it one pack at a time until
-   it shows at least the reviewed total. Existing packs count towards that total.
-   Extra existing packs are left in place; the batch does not remove anything.
-5. The batch pauses if the product cannot be found, its pack size changed, it
-   cannot be added, or the visible quantity increase cannot be confirmed. An
-   uncertain Add is not automatically repeated. Inspect the basket, acknowledge
-   the check in the panel and Resume; the actual quantity is read again first.
-6. Pause stops before the next Add click, after any current quantity check finishes.
-   Switching tabs requests a pause. Closing/reloading the side panel preserves
-   progress but requires review of any interrupted click; it never auto-resumes.
-   To choose a replacement, finish the paused batch, save the new product, and
-   review the remaining list. Confirmed ingredients stay checked off.
-7. Check the full Morrisons trolley, quantities and total before ordering yourself.
+- Products are found automatically; saving a choice for every ingredient first is
+  no longer required. Review saved choices only remains an optional shortcut.
+- Duplicate choices become one product line. Comparable quantities are combined
+  before rounding up (600g plus 300g of the same 1kg product needs one pack).
+  Manually edited pack counts are respected and summed.
+- Existing basket packs count towards the reviewed total. Extra existing packs
+  stay in place. The companion never removes products.
+- Each Add or increment click must be confirmed by the product counter settling
+  before the next pack is requested. Missing products, changed sizes, disabled
+  controls and uncertain updates pause the batch. An uncertain click is never
+  automatically repeated: inspect the trolley, acknowledge the check, and Resume.
+- Pause stops before the next click after any current quantity check finishes.
+  Switching tabs requests a pause. Closing/reloading the panel preserves an
+  approved batch, but never auto-resumes. Unapproved matching proposals are not
+  saved; run matching again if you close the panel before approving them.
+- A search scan is bounded to 30 scrolls or 20 seconds, with a notice when that
+  limit is reached. It does not guarantee discovery of every catalogue result.
+  Product lookup for adding also scrolls until the chosen card is found.
+- For a manual choice, select an ingredient, Search, then Read products on this
+  page. This reader now scrolls too. Use this product saves a preference; rerun
+  whole-list matching to include that choice. Add 1 pack still requests a single
+  click and requires checking Morrisons for confirmation.
 
-Confirmation is based on the visible product counter settling, not an independent
-retailer receipt. The sequential browser workflow has local tests, but still needs
-its first end-to-end household basket trial. Morrisons errors, login prompts, stock
-limits or later substitutions may require manual attention.
+The sequential workflow has local tests, but the new automatic matching and
+scrolling flow still needs an end-to-end trial in your logged-in delivery basket.
+Morrisons errors, login prompts, stock limits and substitutions may need attention.
 
 ## What has been tested
 
 The product reader is tested against a small fixture captured from Morrisons'
 public search-results HTML on 12 October 2026. Import/export, quantity guides,
 unknown/unavailable states, exact-product targeting, batch interruption/recovery, existing basket quantities
+scrolling with virtualised cards, automatic matching, combined pack counts
 and one-click acknowledgement are
 also covered by local tests. It has not yet been tested end-to-end in an installed
 browser extension against a logged-in household delivery basket.
@@ -97,7 +97,7 @@ product preferences. Nothing syncs between devices.
 
 Access is limited to groceries.morrisons.com and fd-meal-planner.vercel.app. The
 extension imports only the ingredient list you deliberately send. It reads product
-cards and Product JSON-LD on a page when you press Read products. It does not read
+cards and Product JSON-LD during a requested read, matching pass or approved basket batch. It does not read
 account details, intercept requests, query undocumented APIs, export cookies or
 send data to a third-party API. The side panel renders website text as text rather
 than executable markup.
@@ -112,7 +112,7 @@ meal-planner and Morrisons tabs. Keep a manual shopping-list fallback available.
 - npm test --prefix extension
 - python3 scripts/package_extension.py
 
-The package script copies only the nine runtime files and these instructions
+The package script copies only the ten runtime files and these instructions
 into the ZIP. Development dependencies and test fixtures are not included.
 
 References:

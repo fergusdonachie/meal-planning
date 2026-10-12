@@ -134,3 +134,58 @@ export async function increaseBasketProduct(productUrl, expectedBefore, timeoutM
   }
   return { confirmed: false, quantity: read().quantity, clicked: true };
 }
+
+// Capture each product as we scroll: virtualised grids may remove earlier cards.
+export async function collectMorrisonsResults(targetUrl = null, options = {}) {
+  if (location.origin !== 'https://groceries.morrisons.com') throw new Error('Open Morrisons first.');
+  const timeout = Math.min(options.timeoutMs ?? 20000, 30000);
+  const maxScrolls = Math.min(options.maxScrolls ?? 30, 60);
+  const pause = options.pauseMs ?? 400;
+  const products = new Map();
+  const clean = (value) => (value || '').replace(/\s+/g, ' ').trim();
+  const capture = () => {
+    for (const card of document.querySelectorAll('.product-card-container')) {
+      const title = card.querySelector('[data-test="fop-title"]');
+      const link = title?.closest('a') || card.querySelector('[data-test="fop-product-link"][aria-hidden="false"]');
+      let url;
+      try { const parsed = new URL(link?.getAttribute('href'), location.origin); if (parsed.origin !== location.origin || !/^\/products\/[a-z0-9-]+\/\d+\/?$/i.test(parsed.pathname)) continue; url = parsed.origin + parsed.pathname.replace(/\/$/, ''); } catch { continue; }
+      const name = clean(title?.textContent || link?.textContent); if (!name) continue;
+      const add = card.querySelector('button[data-test="counter:increment"]') || [...card.querySelectorAll('button')].find((button) => /^add\b.*\bto basket$/i.test(button.getAttribute('aria-label') || ''));
+      const unavailable = /(out of stock|unavailable|not available)/i.test(card.textContent);
+      const enabled = add && !add.disabled && add.getAttribute('aria-disabled') !== 'true';
+      products.set(url, { url, name, size: clean(card.querySelector('[data-test="fop-size"] span:not(.salt-vc)')?.textContent),
+        price: clean(card.querySelector('[data-test="fop-price"]')?.textContent),
+        offer: clean(card.querySelector('[data-test="fop-offer-text"]')?.textContent),
+        canAdd: Boolean(enabled && !unavailable), availability: unavailable ? 'unavailable' : enabled ? 'addable' : 'unknown',
+        checkedAt: new Date().toISOString(), source: 'scrolled-page' });
+    }
+  };
+  const deadline = Date.now() + timeout;
+  const originalY = window.scrollY;
+  window.scrollTo(0, 0);
+  await new Promise((resolve) => setTimeout(resolve, pause));
+  let quietAtBottom = 0;
+  let lastCount = -1;
+  let iterations = 0;
+  for (; iterations < maxScrolls && Date.now() < deadline; iterations++) {
+    capture();
+    if (targetUrl && products.has(targetUrl)) {
+      // Leave the target mounted for quantity checks and Add actions.
+      return { url: location.href, products: [...products.values()], checkedAt: new Date().toISOString(), targetFound: true, truncated: false };
+    }
+    const height = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight || 0);
+    const bottom = window.scrollY + window.innerHeight >= height - 40;
+    if (bottom) {
+      const more = [...document.querySelectorAll('button')].find((button) => /^(load more|show more|show more products|load more products)$/i.test(clean(button.textContent)) && !button.disabled && button.getAttribute('aria-disabled') !== 'true');
+      if (more) { more.click(); quietAtBottom = 0; }
+      else quietAtBottom = products.size === lastCount ? quietAtBottom + 1 : 0;
+      if (quietAtBottom >= 3) break;
+    }
+    lastCount = products.size;
+    window.scrollBy(0, Math.max(300, Math.floor(window.innerHeight * 0.75)));
+    await new Promise((resolve) => setTimeout(resolve, pause));
+  }
+  capture();
+  if (!targetUrl) window.scrollTo(0, originalY);
+  return { url: location.href, products: [...products.values()], checkedAt: new Date().toISOString(), targetFound: targetUrl ? products.has(targetUrl) : undefined, truncated: iterations >= maxScrolls || Date.now() >= deadline };
+}

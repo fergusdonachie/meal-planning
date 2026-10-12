@@ -1,5 +1,6 @@
 import { APP_ORIGIN, MORRISONS_ORIGIN, validateImport, productUrl, searchUrl, ingredientQuery, suggestedPacks } from './model.js';
-import { readMorrisonsPage, requestAddOnePack, inspectBasketProduct, increaseBasketProduct } from './product-reader.js';
+import { requestAddOnePack, inspectBasketProduct, increaseBasketProduct, collectMorrisonsResults } from './product-reader.js';
+import { matchShoppingList, packQuantity, proposalRows } from './matching.js';
 import { prepareBatch, reviewedBatch, recoverBatch, runBatch } from './batch.js';
 
 const $ = (id) => document.getElementById(id);
@@ -10,6 +11,7 @@ let batchRunning = false;
 let stopRequested = false;
 let runnerTab = null;
 let draft = null;
+let proposals = null;
 const element = (tag, text, className) => {
   const node = document.createElement(tag);
   if (text != null) node.textContent = text;
@@ -41,7 +43,7 @@ function render() {
   $('shopping').hidden = !items.length;
   $('progress').textContent = items.length ? `${items.filter((item) => state.checked[item.key]).length} of ${items.length} ingredients checked off` : 'Import your weekly ingredients to get started.';
   const select = $('ingredient'); select.disabled = batchRunning; select.replaceChildren();
-  $('import-file').disabled = batchRunning; $('clear-list').disabled = batchRunning; $('prepare-batch').disabled = batchRunning;
+  $('import-file').disabled = batchRunning; $('clear-list').disabled = batchRunning; $('prepare-batch').disabled = batchRunning; $('auto-match').disabled = batchRunning;
   $('scan').disabled = batchRunning;
   const groups = new Map();
   for (const item of items) {
@@ -120,10 +122,10 @@ $('scan').addEventListener('click', async () => {
   try {
     const tab = await activeTab();
     if (!tab?.url?.startsWith(MORRISONS_ORIGIN + '/')) throw new Error('Open a Morrisons groceries search-results page first.');
-    const [result] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: readMorrisonsPage });
+    const [result] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: collectMorrisonsResults });
     if (!result?.result) throw new Error('The page could not be read. Wait for Morrisons to finish loading.');
     scanned = { ...result.result, tabId: tab.id }; renderProducts();
-    status(`${scanned.products.length} products read from your current Morrisons page.`);
+    status(`${scanned.products.length} products collected while scrolling the results.${scanned.truncated ? ' Scan limit reached; further products may remain.' : ''}`);
   } catch (error) { scanned = null; renderProducts(); status(error.message); }
   finally { busy = false; $('scan').disabled = false; }
 });
@@ -142,7 +144,7 @@ $('clear-list').addEventListener('click', async () => { if (batchRunning) return
 chrome.storage.onChanged.addListener(async (changes, area) => {
   if (area !== 'local') return;
   for (const key of ['shoppingList', 'preferences', 'checked', 'activeIngredient', 'batch']) if (changes[key]) state[key] = changes[key].newValue;
-  if (changes.preferences || changes.shoppingList) draft = null;
+  if (changes.preferences || changes.shoppingList) { draft = null; if (!batchRunning) proposals = null; }
   render();
 });
 chrome.tabs.onUpdated.addListener((tabId, change) => { if (scanned?.tabId === tabId && (change.url || change.status === 'loading')) { scanned = null; renderProducts(); } });
@@ -175,6 +177,7 @@ function renderBatch() {
     }
     return;
   }
+  if (proposals) { renderProposals(review); return; }
   if (!draft) return;
   if (draft.missing.length) {
     review.append(element('p', `${draft.missing.length} ingredients still need a saved product. Choose these before running the whole shop.`));
@@ -231,9 +234,9 @@ async function executeBatch(batch) {
           await assertTab();
           const tab = await chrome.tabs.get(runnerTab);
           if (tab.status === 'complete' && !tab.pendingUrl && tab.url?.startsWith(MORRISONS_ORIGIN + '/search') && new URL(tab.url).searchParams.get('q') === row.name.trim().slice(0, 300)) {
+            const page = await inject(collectMorrisonsResults, [row.url]);
             const observation = await inject(inspectBasketProduct, [row.url]);
             if (observation.found) {
-              const page = await inject(readMorrisonsPage, []);
               const current = page.products.find((product) => product.url === row.url);
               if (row.size && current?.size && row.size.trim().toLowerCase() !== current.size.trim().toLowerCase()) throw new Error(`${row.name} has a different pack size now. Finish this batch and review the product again.`);
               return;
@@ -258,8 +261,90 @@ async function executeBatch(batch) {
 }
 $('prepare-batch').addEventListener('click', () => {
   if (batchRunning || state.batch) return;
-  draft = prepareBatch(state.shoppingList?.items || [], state.preferences, state.checked); renderBatch();
+  proposals = null; draft = prepareBatch(state.shoppingList?.items || [], state.preferences, state.checked); renderBatch();
 });
 $('pause-batch').addEventListener('click', () => { stopRequested = true; status('Pausing after the current quantity check. No further Add clicks will start.'); });
 $('resume-batch').addEventListener('click', () => executeBatch(state.batch).catch((error) => status(error.message)));
-$('discard-batch').addEventListener('click', async () => { if (batchRunning) return; await save({ batch: null }); draft = null; renderBatch(); });
+$('discard-batch').addEventListener('click', async () => { if (batchRunning) return; await save({ batch: null }); draft = null; proposals = null; renderBatch(); });
+
+function renderProposals(container) {
+  const unresolved = proposals.filter((proposal) => !proposal.selected).length;
+  container.append(element('p', `${proposals.length - unresolved} ingredients matched · ${unresolved} need a choice. Review the product and packs below.`));
+  const totals = element('div', null, 'batch-message');
+  const updateTotals = () => { totals.replaceChildren(element('strong', 'Final product totals')); for (const row of proposalRows(proposals)) totals.append(element('p', `${row.target} × ${row.name}`)); };
+  for (const proposal of proposals) {
+    const card = element('div', null, 'batch-row');
+    card.append(element('strong', proposal.item.label));
+    if (proposal.candidates.length) {
+      const select = element('select'); select.setAttribute('aria-label', `Product for ${proposal.item.label}`);
+      for (const candidate of proposal.candidates) {
+        const option = element('option', `${candidate.name} · ${candidate.size} · ${candidate.price}`); option.value = candidate.url; option.selected = candidate.url === proposal.selected; select.append(option);
+      }
+      select.addEventListener('change', () => {
+        proposal.selected = select.value;
+        const product = proposal.candidates.find((candidate) => candidate.url === select.value);
+        const quantity = packQuantity(proposal.item, product); proposal.target = quantity.packs; proposal.note = quantity.reason; proposal.quantityEdited = false;
+        renderBatch();
+      });
+      card.append(select);
+      const label = element('label', 'Packs proposed');
+      const input = element('input'); input.type = 'number'; input.min = '1'; input.max = '20'; input.step = '1'; input.value = String(proposal.target);
+      input.setAttribute('aria-label', `Packs for ${proposal.item.label}`);
+      input.addEventListener('input', () => { proposal.target = input.value ? Number(input.value) : null; proposal.quantityEdited = true; updateTotals(); });
+      label.append(input); card.append(label, element('small', proposal.note));
+    } else {
+      card.append(element('p', proposal.note));
+      card.append(action('Choose this ingredient manually', () => { const key = proposal.item.key; proposals = null; choose(key); }));
+    }
+    if (proposal.truncated) card.append(element('small', 'The search reached its scroll limit; more results may exist.'));
+    container.append(card);
+  }
+  updateTotals(); container.append(totals);
+  container.append(action('Add the reviewed proposed basket', async () => {
+    if (proposals.some((proposal) => !proposal.selected)) throw new Error('Resolve unmatched ingredients before adding the full list.');
+    const preferences = { ...state.preferences };
+    for (const proposal of proposals) {
+      if (!Number.isInteger(proposal.target) || proposal.target < 1 || proposal.target > 20) throw new Error('Check all pack counts (1–20).');
+      const product = proposal.candidates.find((candidate) => candidate.url === proposal.selected);
+      preferences[proposal.item.key] = { ...product, canAdd: false };
+    }
+    const rows = reviewedBatch(proposalRows(proposals));
+    const batch = { listId: state.shoppingList.importedAt, status: 'paused', rows, message: '', createdAt: new Date().toISOString() };
+    proposals = null; draft = null; await save({ preferences, batch }); await executeBatch(batch);
+  }, unresolved > 0));
+}
+
+$('auto-match').addEventListener('click', async () => {
+  if (batchRunning || busy || state.batch) return;
+  const items = (state.shoppingList?.items || []).filter((item) => !state.checked[item.key]);
+  if (!items.length) return status('All ingredients are already checked off.');
+  batchRunning = true; busy = true; stopRequested = false; scanned = null; proposals = null; draft = null; render();
+  try {
+    const tab = await chrome.tabs.create({ url: MORRISONS_ORIGIN + '/', active: true }); runnerTab = tab.id;
+    const assertActive = async () => {
+      if (stopRequested || (await activeTab())?.id !== runnerTab) throw new Error('Matching paused. Keep the Morrisons tab selected.');
+    };
+    proposals = await matchShoppingList(items, state.preferences, {
+      progress: async (item, done, total) => { status(`Finding products ${done + 1}/${total}: ${item.label}`); },
+      search: async (_item, query) => {
+        await assertActive(); await chrome.tabs.update(runnerTab, { url: searchUrl(query) });
+        const deadline = Date.now() + 30000;
+        while (Date.now() < deadline) {
+          await assertActive(); const tab = await chrome.tabs.get(runnerTab);
+          if (tab.status === 'complete' && !tab.pendingUrl && tab.url?.startsWith(MORRISONS_ORIGIN + '/search') && new URL(tab.url).searchParams.get('q') === query.slice(0, 300)) {
+            const [result] = await chrome.scripting.executeScript({ target: { tabId: runnerTab }, func: collectMorrisonsResults });
+            if (result?.result) return result.result;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+        throw new Error('Search did not finish loading. Check Morrisons login, consent or stock results.');
+      },
+    }, () => stopRequested);
+    status(stopRequested ? 'Matching paused. Partial proposals are shown; run matching again to cover the full list.' : 'Whole-list matching finished. Review the proposed basket below.');
+    if (proposals.length !== items.length) {
+      const remaining = items.slice(proposals.length).map((item) => ({ item, candidates: [], selected: null, target: null, note: 'Not searched because matching was paused.' }));
+      proposals.push(...remaining);
+    }
+  } catch (error) { status(error.message); }
+  finally { batchRunning = false; busy = false; runnerTab = null; render(); }
+});

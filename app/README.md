@@ -36,7 +36,8 @@ does not run the Vercel password gate. Pepesto is not connected yet.
 The shopping modal can send its combined, pantry-filtered ingredient list to the
 Chrome/Edge companion in `../extension/`. It reads current Morrisons product cards,
 saves preferred products and offers both a reviewed one-pack Add action and a
-whole-list batch. The batch uses saved products and reviewed pack targets, accounts
+whole-list batch. It searches and scrolls for every ingredient, proposes suitable
+products and pack counts for one review, then adds the approved choices. It accounts
 for existing basket quantities, and pauses on missing products or uncertain updates. It does not
 perform checkout or require Pepesto. The ZIP and guide are served under
 `/downloads/`, behind the app password. See `../extension/README.md` for install

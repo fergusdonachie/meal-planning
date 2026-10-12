@@ -8,7 +8,7 @@ source = root / 'extension'
 destination = root / 'app/public/downloads'
 destination.mkdir(parents=True, exist_ok=True)
 files = ['manifest.json', 'background.js', 'bridge.js', 'model.js', 'product-reader.js',
-         'panel.html', 'panel.css', 'panel.js', 'batch.js', 'README.md']
+         'panel.html', 'panel.css', 'panel.js', 'batch.js', 'matching.js', 'README.md']
 manifest = json.loads((source / 'manifest.json').read_text())
 assert manifest['manifest_version'] == 3
 assert set(manifest['permissions']) == {'storage', 'scripting', 'sidePanel'}

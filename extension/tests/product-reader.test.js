@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseHTML } from 'linkedom';
-import { readMorrisonsPage, requestAddOnePack } from '../product-reader.js';
+import { readMorrisonsPage, requestAddOnePack, collectMorrisonsResults } from '../product-reader.js';
 const fixture = readFileSync(new URL('./fixtures/morrisons-search.html', import.meta.url), 'utf8');
 function page(html = fixture) {
   globalThis.document = parseHTML(html).document;
@@ -96,4 +96,44 @@ test('a click with no quantity acknowledgement times out without retrying', asyn
   document.querySelectorAll('.product-card-container')[1].querySelector('button').click = () => { clicks++; };
   const result = await increaseBasketProduct(targetUrl, 0, 50);
   assert.equal(clicks, 1); assert.equal(result.confirmed, false);
+});
+
+function scrollingPage() {
+  page(`<html><body>${fixture}</body></html>`);
+  const cards = [...document.querySelectorAll('.product-card-container')];
+  const holder = cards[0].parentNode;
+  cards.forEach((card) => card.remove()); holder.append(cards[0]);
+  Object.defineProperty(document.documentElement, 'scrollHeight', { value: 1800 });
+  let index = 0;
+  globalThis.window = {
+    scrollY: 0, innerHeight: 600,
+    scrollBy(_x, y) {
+      this.scrollY = Math.min(1200, this.scrollY + y);
+      if (index < cards.length - 1) { cards[index].remove(); holder.append(cards[++index]); }
+    },
+    scrollTo(_x, y) { this.scrollY = y; },
+  };
+  return cards;
+}
+
+test('scroll reader retains earlier cards when later results replace them', async () => {
+  scrollingPage();
+  const result = await collectMorrisonsResults(null, { pauseMs: 1, maxScrolls: 10, timeoutMs: 1000 });
+  assert.equal(result.products.length, 3);
+  assert.equal(result.truncated, false);
+  assert.equal(window.scrollY, 0);
+});
+
+test('target lookup scrolls to a later card and leaves it mounted for adding', async () => {
+  scrollingPage();
+  const result = await collectMorrisonsResults(targetUrl, { pauseMs: 1, maxScrolls: 10, timeoutMs: 1000 });
+  assert.equal(result.targetFound, true);
+  assert.ok(window.scrollY > 0);
+  assert.equal(inspectBasketProduct(targetUrl).found, true);
+});
+
+test('scroll reader reports a bounded scan instead of claiming complete results', async () => {
+  scrollingPage();
+  const result = await collectMorrisonsResults(null, { pauseMs: 1, maxScrolls: 1, timeoutMs: 1000 });
+  assert.equal(result.truncated, true);
 });
