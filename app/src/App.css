@@ -4,6 +4,30 @@
   padding: 24px max(16px, env(safe-area-inset-left, 0px)) 96px max(16px, env(safe-area-inset-right, 0px));
 }
 
+.app-navigation { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 26px; }
+.app-navigation > a { text-decoration: none; font-weight: 700; padding: 10px 14px; border-radius: 10px; color: var(--ink-soft); }
+.app-navigation > a.active { background: var(--olive-soft); color: var(--olive); }
+.app-navigation span { display: inline-block; margin-left: 5px; font-size: 11px; background: var(--paper); padding: 2px 6px; border-radius: 12px; }
+.logout-form { margin-left: auto; }
+.logout-form button, .week-reset { background: none; border: none; color: var(--ink-soft); font: inherit; text-decoration: underline; cursor: pointer; padding: 10px; }
+.week-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 24px; }
+.week-toolbar .addbtn { flex: 0 1 auto; }
+.cook-link { text-align: center; text-decoration: none; display: inline-block; }
+.week-progress { display: grid; gap: 8px; min-width: 180px; color: var(--olive); }
+.week-progress progress { width: 100%; accent-color: var(--olive); }
+.week-card-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.week-meta { color: var(--ink-soft); font-size: 12px; margin-bottom: 18px; }
+.cooked-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 10px 0; font-weight: 600; cursor: pointer; }
+.cooked-toggle input { width: 18px; height: 18px; accent-color: var(--olive); }
+.detail-cooked { margin-left: 16px; }
+.cooked-badge { position: absolute; top: 10px; left: 10px; background: var(--olive); color: white; border-radius: 6px; padding: 5px 10px; font-weight: 700; }
+.cooked-meals { margin-top: 32px; }
+.week-card.cooked { border-color: var(--olive); }
+.week-success, .week-reset-confirm { background: var(--olive-soft); border-radius: 10px; padding: 18px; margin-bottom: 24px; }
+.week-reset-confirm p { margin-top: 0; }
+.week-reset-confirm .addbtn { margin-right: 12px; }
+.week-bar-link { color: var(--cream); font-weight: 600; font-size: 13px; }
+
 .statusmsg {
   padding: 80px 20px;
   text-align: center;

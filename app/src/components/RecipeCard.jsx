@@ -37,7 +37,7 @@ export default function RecipeCard({ recipe }) {
             className={`addbtn ${added ? "added" : ""}`}
             onClick={() => toggle(recipe.id)}
           >
-            {added ? "✓ Added to list" : "+ Add to shopping list"}
+            {added ? "✓ In this week's menu" : "+ Add to this week"}
           </button>
         </div>
       </div>

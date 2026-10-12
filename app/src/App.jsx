@@ -7,6 +7,8 @@ import ShoppingBar from "./components/ShoppingBar";
 import ShoppingListModal from "./components/ShoppingListModal";
 import Home from "./pages/Home";
 import RecipeDetail from "./pages/RecipeDetail";
+import Week from "./pages/Week";
+import AppNavigation from "./components/AppNavigation";
 import { RECIPES_URL } from "./lib/github";
 
 export default function App() {
@@ -36,8 +38,10 @@ export default function App() {
   return (
     <ShoppingProvider>
       <div className="wrap">
+        <AppNavigation />
         <Routes>
           <Route path="/" element={<Home recipes={recipes} />} />
+          <Route path="/week" element={<Week recipes={recipes} onShopping={() => setModalOpen(true)} />} />
           <Route path="/recipe/:id" element={<RecipeDetail recipes={recipes} />} />
         </Routes>
       </div>

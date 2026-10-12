@@ -1,4 +1,5 @@
 import { useShopping } from "../context/ShoppingContext";
+import { Link } from "react-router-dom";
 
 export default function ShoppingBar({ recipes, onView }) {
   const { selected, clear } = useShopping();
@@ -17,6 +18,7 @@ export default function ShoppingBar({ recipes, onView }) {
           </span>
         </div>
         <button type="button" className="clearbtn" onClick={clear}>Clear</button>
+        <Link className="week-bar-link" to="/week">Cook this week's meals →</Link>
         <button type="button" className="viewbtn" onClick={onView}>View shopping list</button>
       </div>
     </div>

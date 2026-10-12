@@ -12,6 +12,7 @@ A recipe bank for weekly menu and grocery planning: fresh, from-scratch dinners 
 - `images/` — 36 compressed WebP recipe photos, one per recipe named after its `id`. Final generation prompts are in `images/prompts.json`. Used by `app/`; the static `site/` page does not show photos.
 - `scripts/sync_recipes.py` — validates recipe data and updates the standalone page.
 - `docs/morrisons.md` — basket integration research and next prototype requirements.
+- `docs/private-access.md` — shared-password setup and weekly cooking features.
 
 ## Recipe mix
 
@@ -49,6 +50,12 @@ Each recipe is an object with:
 2. Optionally drop a photo into `images/<id>.jpg` (jpg/png/webp all work — just match the `image` field's extension).
 3. Run `python3 scripts/sync_recipes.py` to update the standalone page; `python3 scripts/sync_recipes.py --check` verifies alignment and the data.
 4. Push to GitHub. The deployed app checks GitHub for published updates on page load. Local development reads the working tree, and each build also includes a fallback copy of recipes and photos. App code changes require a redeploy.
+
+## Private household access
+
+Selected recipe cards live at `/week`, with saved cooked ticks and a new-week reset. Menus are stored per browser and do not yet sync between devices.
+
+The app includes a server-side shared-password gate on Vercel. Set `APP_PASSWORD` and `APP_SESSION_SECRET` before deploying; see `docs/private-access.md`. Missing settings block access. Future Pepesto credentials must stay in server-only environment variables.
 
 ## Deploying `app/` to Vercel
 

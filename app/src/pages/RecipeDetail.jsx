@@ -6,7 +6,7 @@ import { CUISINE_COLOR } from "../lib/constants";
 
 export default function RecipeDetail({ recipes }) {
   const { id } = useParams();
-  const { selected, toggle } = useShopping();
+  const { selected, completed, toggle, toggleCompleted } = useShopping();
   const recipe = recipes.find((r) => r.id === id);
 
   if (!recipe) {
@@ -23,7 +23,7 @@ export default function RecipeDetail({ recipes }) {
 
   return (
     <article className="detail">
-      <Link to="/" className="backlink">← Back to the recipe bank</Link>
+      <Link to={added ? "/week" : "/"} className="backlink">← {added ? "This week's recipes" : "Back to the recipe bank"}</Link>
       <div className="detail-media">
         <RecipeImage key={recipe.image} recipe={recipe} className="detail-image" />
         {recipe.imageSource === "ai" && <span className="image-credit">AI-generated image</span>}
@@ -49,6 +49,7 @@ export default function RecipeDetail({ recipes }) {
       <button type="button" className={`addbtn detail-addbtn ${added ? "added" : ""}`} onClick={() => toggle(recipe.id)}>
         {added ? "✓ Added to shopping list" : "+ Add to shopping list"}
       </button>
+      {added && <label className="cooked-toggle detail-cooked"><input type="checkbox" checked={completed.has(recipe.id)} onChange={() => toggleCompleted(recipe.id)} /> I've cooked this meal</label>}
 
       <div className="detail-grid">
         <section>
