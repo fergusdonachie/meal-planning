@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
-import { RECIPES_URL } from "../lib/github";
+import { LOCAL_RECIPES_URL, RECIPES_URL } from "../lib/github";
 
 export function useRecipes() {
   const [state, setState] = useState({ recipes: null, error: null, loading: true });
 
   useEffect(() => {
     let cancelled = false;
-    setState({ recipes: null, error: null, loading: true });
 
-    fetch(RECIPES_URL, { cache: "no-store" })
-      .then((res) => {
-        if (!res.ok) throw new Error(`GitHub returned ${res.status}`);
-        return res.json();
+    async function readRecipes(url) {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Recipe request returned ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) throw new Error("The recipe bank is empty or invalid");
+      return data;
+    }
+
+    readRecipes(RECIPES_URL)
+      .catch((err) => {
+        if (RECIPES_URL === LOCAL_RECIPES_URL) throw err;
+        return readRecipes(LOCAL_RECIPES_URL);
       })
       .then((data) => {
         if (!cancelled) setState({ recipes: data, error: null, loading: false });

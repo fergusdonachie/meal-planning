@@ -42,7 +42,7 @@ export default function Home({ recipes }) {
         <div className="titleblock">
           <p className="eyebrow">Recipe bank · Mediterranean · Persian · Asian · Mexican</p>
           <h1>The Weekly Table</h1>
-          <p>Fresh, from-scratch dinners for menu and grocery planning — no ultra-processed shortcuts, fish worked in weekly, and nothing overly calorific. Filter by cuisine or protein, then build a shopping list.</p>
+          <p>Quick, from-scratch dinners for two, with fresh herbs, whole spices and homemade curry bases. Choose plain staples, work fish into the week, then prepare your Morrisons shopping list.</p>
         </div>
         <div className="headline-stats">
           <div><span className="n">{recipes.length}</span><span className="l">Recipes</span></div>

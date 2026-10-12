@@ -25,7 +25,8 @@ export default function RecipeDetail({ recipes }) {
     <article className="detail">
       <Link to="/" className="backlink">← Back to the recipe bank</Link>
       <div className="detail-media">
-        <RecipeImage recipe={recipe} className="detail-image" />
+        <RecipeImage key={recipe.image} recipe={recipe} className="detail-image" />
+        {recipe.imageSource === "ai" && <span className="image-credit">AI-generated image</span>}
         <span className="cuisine-tag" style={{ background: `var(--${color}-soft)`, color: `var(--${color})` }}>
           {recipe.cuisine}
         </span>
@@ -39,10 +40,11 @@ export default function RecipeDetail({ recipes }) {
           {recipe.fish ? <span className="fish-badge">🐟 Fish</span> : <span className="protein-badge">{recipe.protein}</span>}
         </span>
         <span className="m">⏱ {recipe.time} min</span>
-        <span className="m">{recipe.kcal} kcal</span>
+        <span className="m">~{recipe.kcal} kcal</span>
         <span className="m">Serves {recipe.servings}</span>
         <span className="m"><SpiceDots level={recipe.spice} /></span>
       </div>
+      <p className="recipe-note">Calories are estimates per serving. Choose plain staples and check ingredient labels for unnecessary additives.</p>
 
       <button type="button" className={`addbtn detail-addbtn ${added ? "added" : ""}`} onClick={() => toggle(recipe.id)}>
         {added ? "✓ Added to shopping list" : "+ Add to shopping list"}

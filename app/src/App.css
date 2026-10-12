@@ -514,6 +514,40 @@ header.top {
   padding: 20px 0;
 }
 
+.image-credit {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(20, 17, 14, 0.75);
+  color: white;
+  font-size: 10px;
+}
+.recipe-note { color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
+.shopping-handoff { background: var(--olive-soft); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.shopping-handoff h3 { margin: 0 0 6px; font-size: 18px; }
+.shopping-handoff p { margin: 0 0 12px; color: var(--ink-soft); line-height: 1.5; }
+.shopping-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.shopping-actions a { font-weight: 600; padding: 8px 0; }
+.shopping-actions button:disabled { opacity: 0.5; cursor: default; }
+.shopping-status { font-size: 13px; color: var(--olive); }
+.copy-list { width: 100%; padding: 10px; font: inherit; background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+.listgroup h4 { flex-wrap: wrap; }
+.listgroup h4 small { font-family: 'Karla', sans-serif; color: var(--ink-soft); font-weight: 400; }
+.listgroup .ingredient-checklist { list-style: none; padding-left: 0; }
+.ingredient-checklist label { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; cursor: pointer; }
+.ingredient-checklist input { accent-color: var(--olive); }
+.ingredient-checklist .in-pantry span { text-decoration: line-through; color: var(--ink-soft); }
+.shopping-view { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.shopping-view [aria-pressed="true"] { background: var(--olive); color: var(--paper); }
+.combined-list { list-style: none; padding: 0; }
+.combined-list li { border-bottom: 1px solid var(--line); padding: 4px 0; }
+.combined-list small { display: block; color: var(--ink-soft); font-size: 11px; line-height: 1.5; margin-top: 3px; }
+.shopping-section { margin-top: 22px; }
+.shopping-section h3 { margin: 0; padding-bottom: 8px; border-bottom: 2px solid var(--olive); font-size: 17px; }
+.shopping-section .combined-list { margin-top: 4px; }
+
 @media (max-width: 560px) {
   .filterrow .flabel {
     width: auto;

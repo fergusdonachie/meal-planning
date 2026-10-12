@@ -8,14 +8,18 @@ A recipe bank for weekly menu and grocery planning: fresh, from-scratch dinners 
 
 - `app/` — a React + Vite app with recipe photos, a detail page per recipe, and the same filtering/shopping-list features. Fetches `data/recipes.json` (and images) directly from GitHub at runtime — see `app/README.md`. Deploy this to Vercel.
 - `site/index.html` — the original self-contained interactive recipe bank (no photos): filter by cuisine, protein, and time; expand any card for ingredients and method; select meals to build a shopping list. No build step — open it directly in a browser, or it's what's published as the Claude Artifact above.
-- `data/recipes.json` — the source of truth for all 24 recipes as structured data (see schema below).
-- `images/` — recipe photos, one per recipe named after its `id` (e.g. `med-chicken-traybake.jpg`). Used by `app/`; the static `site/` page doesn't show photos.
+- `data/recipes.json` — the source of truth for all 36 recipes as structured data (see schema below).
+- `images/` — 36 compressed WebP recipe photos, one per recipe named after its `id`. Final generation prompts are in `images/prompts.json`. Used by `app/`; the static `site/` page does not show photos.
+- `scripts/sync_recipes.py` — validates recipe data and updates the standalone page.
+- `docs/morrisons.md` — basket integration research and next prototype requirements.
 
 ## Recipe mix
 
-- 24 recipes: 8 fish, 7 chicken, 4 red meat, 5 vegetarian
-- Mostly 15–45 minutes, 380–600 kcal per serving, serves 2 — each recipe is a full plate (protein + carb/starch + vegetables), not just the protein component
-- No ultra-processed ingredients — tinned beans/tomatoes/tuna and good pantry staples only, no jarred sauces or stock cubes
+- 36 recipes: 12 fish, 11 chicken, 4 red meat, 9 vegetarian
+- Mostly 20–40 minutes (one existing traybake takes 55 minutes), 380–600 kcal per serving, serves 2 — each recipe is a full plate (protein + carb/starch + vegetables), not just the protein component
+- Fresh aromatics and homemade curry bases, with plain tinned beans/tomatoes/tuna and simple pantry staples. Choose products with short ingredient lists; no stock cubes or ready-made Thai curry paste.
+- Every recipe has an AI-generated illustrative photo, labelled in the app. Calories are approximate per serving.
+- Morrisons shopping handoff: combine recipe ingredients into an overall list, exclude ingredients already in your kitchen, copy/share the list, then open the shop. Automatic basket transfer is not connected; see `docs/morrisons.md`.
 
 ## Recipe data schema (`data/recipes.json`)
 
@@ -29,7 +33,8 @@ Each recipe is an object with:
 | `fish` | boolean | Redundant with `protein` but kept for fast filtering |
 | `title` | string | |
 | `blurb` | string | One-line description shown on cards |
-| `image` | string | Relative path under the repo root, e.g. `images/med-chicken-traybake.jpg` — doesn't need to exist yet; the app falls back to a styled placeholder |
+| `image` | string | Relative path under the repo root, e.g. `images/med-chicken-traybake.webp`; the app falls back to a styled placeholder if missing |
+| `imageSource` | string | `ai` labels generated illustrations; omit for real photos |
 | `time` | number | Minutes |
 | `kcal` | number | Per serving |
 | `servings` | number | Currently `2` for every recipe |
@@ -42,7 +47,8 @@ Each recipe is an object with:
 
 1. Edit `data/recipes.json` (add a new object to the array, or change an existing one — it must stay valid JSON).
 2. Optionally drop a photo into `images/<id>.jpg` (jpg/png/webp all work — just match the `image` field's extension).
-3. Push to GitHub. `app/` (once deployed) picks up the change on next page load, no redeploy needed. `site/index.html` embeds its data inline, so mirror ingredient/method/etc. changes into the `RECIPES` array there too if you want the static page to match — the `image` and `servings` fields aren't used by `site/` and don't need mirroring.
+3. Run `python3 scripts/sync_recipes.py` to update the standalone page; `python3 scripts/sync_recipes.py --check` verifies alignment and the data.
+4. Push to GitHub. The deployed app checks GitHub for published updates on page load. Local development reads the working tree, and each build also includes a fallback copy of recipes and photos. App code changes require a redeploy.
 
 ## Deploying `app/` to Vercel
 

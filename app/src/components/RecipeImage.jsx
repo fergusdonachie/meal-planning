@@ -11,6 +11,7 @@ const CUISINE_ICON = {
 
 export default function RecipeImage({ recipe, className = "" }) {
   const [failed, setFailed] = useState(false);
+  const [localFallback, setLocalFallback] = useState(false);
   const color = CUISINE_COLOR[recipe.cuisine];
 
   if (failed || !recipe.image) {
@@ -29,9 +30,14 @@ export default function RecipeImage({ recipe, className = "" }) {
   return (
     <img
       className={`recipe-image ${className}`}
-      src={imageUrl(recipe.image)}
+      src={localFallback ? `/${recipe.image}` : imageUrl(recipe.image)}
       alt={recipe.title}
-      onError={() => setFailed(true)}
+      loading="lazy"
+      decoding="async"
+      onError={() => {
+        if (!import.meta.env.DEV && !localFallback) setLocalFallback(true);
+        else setFailed(true);
+      }}
     />
   );
 }

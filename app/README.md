@@ -4,11 +4,11 @@ React + Vite frontend for the meal-planning recipe bank. Shows recipe photos and
 
 ## How data flows
 
-There's no backend and no build-time data fetch. On page load, the app fetches `data/recipes.json` straight from GitHub (`raw.githubusercontent.com/<owner>/<repo>/<branch>/data/recipes.json`, see `src/lib/github.js`), and each recipe's photo the same way from its `image` path. That means:
+There's no backend. Local development serves `../data/recipes.json` and `../images/` directly, so unpublished changes are visible. Builds bundle a snapshot of both. In production, on page load, the app fetches `data/recipes.json` straight from GitHub (`raw.githubusercontent.com/<owner>/<repo>/<branch>/data/recipes.json`, see `src/lib/github.js`), and each recipe's photo the same way from its `image` path. That means:
 
 - Editing `data/recipes.json` (or adding a photo to `images/`) on GitHub and pushing is enough — no redeploy of the Vercel app required.
 - The GitHub repo must be **public**, since the fetch is unauthenticated client-side (no token can safely live in the browser bundle).
-- A recipe with no matching file at its `image` path just shows a cuisine-colored placeholder (see `src/components/RecipeImage.jsx`) — photos can be added gradually.
+- If GitHub cannot serve the recipe data or photo, the app tries its bundled snapshot. A recipe with no matching file at its `image` path then shows a cuisine-colored placeholder (see `src/components/RecipeImage.jsx`) — photos can be added gradually.
 
 ## Local development
 
@@ -17,7 +17,15 @@ npm install
 npm run dev
 ```
 
-By default this points at `fergusdonachie/meal-planning@main`. To point at a fork or a branch (e.g. to preview data changes before merging), copy `.env.example` to `.env` and set `VITE_GITHUB_OWNER` / `VITE_GITHUB_REPO` / `VITE_GITHUB_BRANCH`.
+Production points at `fergusdonachie/meal-planning@main`. To point production at a fork or a branch, copy `.env.example` to `.env` and set `VITE_GITHUB_OWNER` / `VITE_GITHUB_REPO` / `VITE_GITHUB_BRANCH`.
+
+## Shopping and photos
+
+The shopping modal saves pantry exclusions and offers copy/share controls plus a link to Morrisons. It does not add products to a retailer basket. See `../docs/morrisons.md` for the integration research. The shopping list opens in a combined view, adding repeated ingredients and converting compatible metric/spoon units. It groups items into supermarket sections (produce, meat, fish, dairy, bakery, frozen and cupboard staples); copy/share includes the same section headings. This is a general supermarket order, not the exact layout of a particular Morrisons store. A By recipe view preserves the original breakdown. Different measures are shown together without converting weight to volume; alternatives and unclear quantities remain explicit. Copy/share follows the selected view, and pantry exclusions apply to both.
+
+All current photos are generated illustrations labelled in the UI. Their prompts are in `../images/prompts.json`. Calories are estimates.
+
+Checks: `npm run lint`, `npm test`, `npm run build`, and from the repository root `python3 scripts/sync_recipes.py --check`.
 
 ## Deploying to Vercel
 

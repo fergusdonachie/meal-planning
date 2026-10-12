@@ -12,7 +12,8 @@ export default function RecipeCard({ recipe }) {
   return (
     <article className="card">
       <Link to={`/recipe/${recipe.id}`} className="card-media-link">
-        <RecipeImage recipe={recipe} className="card-media" />
+        <RecipeImage key={recipe.image} recipe={recipe} className="card-media" />
+        {recipe.imageSource === "ai" && <span className="image-credit">AI-generated image</span>}
         <span className="cuisine-tag" style={{ background: `var(--${color}-soft)`, color: `var(--${color})` }}>
           {recipe.cuisine}
         </span>
@@ -27,7 +28,7 @@ export default function RecipeCard({ recipe }) {
             {recipe.fish ? <span className="fish-badge">🐟 Fish</span> : <span className="protein-badge">{recipe.protein}</span>}
           </span>
           <span className="m">⏱ {recipe.time} min</span>
-          <span className="m">{recipe.kcal} kcal</span>
+          <span className="m">~{recipe.kcal} kcal</span>
           <span className="m"><SpiceDots level={recipe.spice} /></span>
         </div>
         <div className="addrow">
