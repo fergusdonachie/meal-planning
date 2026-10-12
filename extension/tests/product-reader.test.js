@@ -61,3 +61,39 @@ test('missing site selectors return no products and unrelated origins are refuse
   location.origin = 'https://evil.example';
   assert.throws(() => readMorrisonsPage(), /Morrisons/);
 });
+
+const { inspectBasketProduct, increaseBasketProduct } = await import('../product-reader.js');
+const targetUrl = 'https://groceries.morrisons.com/products/morrisons-basmati-rice-1kg/104544029';
+
+test('Morrisons quantity and increment selectors identify existing basket quantities', () => {
+  page();
+  const card = document.querySelectorAll('.product-card-container')[1];
+  card.querySelector('button').remove();
+  const input = document.createElement('input'); input.setAttribute('data-test', 'quantity-in-basket'); input.value = '2'; card.append(input);
+  const plus = document.createElement('button'); plus.setAttribute('data-test', 'counter:increment'); card.append(plus);
+  assert.equal(inspectBasketProduct(targetUrl).quantity, 2);
+  assert.equal(inspectBasketProduct(targetUrl).canIncrease, true);
+  plus.setAttribute('aria-disabled', 'true');
+  assert.equal(inspectBasketProduct(targetUrl).canIncrease, false);
+});
+
+test('one Add click is confirmed only after the product counter shows the increment', async () => {
+  page();
+  const card = document.querySelectorAll('.product-card-container')[1];
+  const button = card.querySelector('button');
+  let clicks = 0;
+  button.click = () => {
+    clicks++;
+    button.remove();
+    const input = document.createElement('input'); input.setAttribute('data-test', 'quantity-in-basket'); input.value = '1'; card.append(input);
+  };
+  const result = await increaseBasketProduct(targetUrl, 0, 2000);
+  assert.equal(clicks, 1); assert.equal(result.confirmed, true); assert.equal(result.quantity, 1);
+});
+
+test('a click with no quantity acknowledgement times out without retrying', async () => {
+  page(); let clicks = 0;
+  document.querySelectorAll('.product-card-container')[1].querySelector('button').click = () => { clicks++; };
+  const result = await increaseBasketProduct(targetUrl, 0, 50);
+  assert.equal(clicks, 1); assert.equal(result.confirmed, false);
+});

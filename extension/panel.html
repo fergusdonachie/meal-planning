@@ -17,6 +17,14 @@
  <button id="scan" class="primary">Read products on this page</button>
  <p class="hint">Log into Morrisons and select your delivery address/slot first. “Add available” describes the page now; Morrisons confirms final delivery availability.</p>
  <div id="results"></div>
+ <section id="batch-section" aria-labelledby="batch-title">
+  <h2 id="batch-title">Add the whole shop</h2>
+  <p class="hint">Save a preferred product for every ingredient, then review pack totals. The batch makes sure the basket contains at least those totals; it never removes existing items.</p>
+  <button id="prepare-batch">Review full shopping list</button>
+  <div id="batch-review"></div>
+  <div id="batch-progress" role="status" aria-live="polite"></div>
+  <div class="actions"><button id="pause-batch" hidden>Pause batch</button><button id="resume-batch" hidden>Resume batch</button><button id="discard-batch" class="quiet" hidden>Finish this batch</button></div>
+ </section>
  <h2>Your ingredient checklist</h2><div id="checklist"></div>
 </section>
 <footer><button id="clear-list" class="quiet">Clear imported list</button><p>Stored in this browser only. No grocery API fees, password collection or automatic checkout.</p></footer>

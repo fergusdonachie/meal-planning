@@ -38,13 +38,45 @@ This package is for a desktop browser; it is not an iPhone extension.
    login prompts and confirmation. Choose any additional quantity using Morrisons'
    own controls, then tick the ingredient off in the companion.
 8. Complete your delivery order directly in Morrisons. The extension does not
-   book slots, place orders, handle payment or run a bulk add/checkout loop.
+   book slots, place orders or handle payment.
+
+## Add the whole shopping list (version 0.2)
+
+1. Save a preferred product for each remaining ingredient with Use this product.
+   A manual Add action now also remembers that product choice. Products are never
+   silently substituted when a saved choice cannot be found.
+2. Click Review full shopping list. Any ingredients without a product are listed
+   for you to choose first. Review every pack total; enter counts where the
+   ingredient units cannot be converted. Duplicate choices of the same product
+   become one line, with comparable quantities combined before rounding.
+3. Click Add reviewed shopping list to basket. A dedicated Morrisons tab opens and
+   searches each exact saved product in turn. Keep that tab selected while it runs.
+   This uses your existing Morrisons login/address session.
+4. The batch checks the product counter and increases it one pack at a time until
+   it shows at least the reviewed total. Existing packs count towards that total.
+   Extra existing packs are left in place; the batch does not remove anything.
+5. The batch pauses if the product cannot be found, its pack size changed, it
+   cannot be added, or the visible quantity increase cannot be confirmed. An
+   uncertain Add is not automatically repeated. Inspect the basket, acknowledge
+   the check in the panel and Resume; the actual quantity is read again first.
+6. Pause stops before the next Add click, after any current quantity check finishes.
+   Switching tabs requests a pause. Closing/reloading the side panel preserves
+   progress but requires review of any interrupted click; it never auto-resumes.
+   To choose a replacement, finish the paused batch, save the new product, and
+   review the remaining list. Confirmed ingredients stay checked off.
+7. Check the full Morrisons trolley, quantities and total before ordering yourself.
+
+Confirmation is based on the visible product counter settling, not an independent
+retailer receipt. The sequential browser workflow has local tests, but still needs
+its first end-to-end household basket trial. Morrisons errors, login prompts, stock
+limits or later substitutions may require manual attention.
 
 ## What has been tested
 
 The product reader is tested against a small fixture captured from Morrisons'
 public search-results HTML on 12 October 2026. Import/export, quantity guides,
-unknown/unavailable states, exact-product targeting and one-click behaviour are
+unknown/unavailable states, exact-product targeting, batch interruption/recovery, existing basket quantities
+and one-click acknowledgement are
 also covered by local tests. It has not yet been tested end-to-end in an installed
 browser extension against a logged-in household delivery basket.
 
@@ -80,7 +112,7 @@ meal-planner and Morrisons tabs. Keep a manual shopping-list fallback available.
 - npm test --prefix extension
 - python3 scripts/package_extension.py
 
-The package script copies only the eight runtime files and these instructions
+The package script copies only the nine runtime files and these instructions
 into the ZIP. Development dependencies and test fixtures are not included.
 
 References:

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "The Weekly Table — Morrisons companion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shop your weekly ingredients alongside Morrisons, save preferred products and inspect current page availability.",
   "minimum_chrome_version": "116",
   "permissions": ["storage", "scripting", "sidePanel"],

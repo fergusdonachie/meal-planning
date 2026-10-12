@@ -1,10 +1,15 @@
 import { APP_ORIGIN, MORRISONS_ORIGIN, validateImport, productUrl, searchUrl, ingredientQuery, suggestedPacks } from './model.js';
-import { readMorrisonsPage, requestAddOnePack } from './product-reader.js';
+import { readMorrisonsPage, requestAddOnePack, inspectBasketProduct, increaseBasketProduct } from './product-reader.js';
+import { prepareBatch, reviewedBatch, recoverBatch, runBatch } from './batch.js';
 
 const $ = (id) => document.getElementById(id);
-let state = { shoppingList: null, preferences: {}, checked: {}, activeIngredient: null };
+let state = { shoppingList: null, preferences: {}, checked: {}, activeIngredient: null, batch: null };
 let scanned = null;
 let busy = false;
+let batchRunning = false;
+let stopRequested = false;
+let runnerTab = null;
+let draft = null;
 const element = (tag, text, className) => {
   const node = document.createElement(tag);
   if (text != null) node.textContent = text;
@@ -23,8 +28,8 @@ async function openMorrisons(url) {
   renderProducts();
 }
 function action(text, run, disabled = false) {
-  const button = element('button', text); button.type = 'button'; button.disabled = disabled;
-  button.addEventListener('click', async () => { try { await run(); } catch (error) { status(error.message); } });
+  const button = element('button', text); button.type = 'button'; button.disabled = disabled || batchRunning;
+  button.addEventListener('click', async () => { if (batchRunning) return; try { await run(); } catch (error) { status(error.message); } });
   return button;
 }
 function choose(key) {
@@ -35,7 +40,9 @@ function render() {
   if (!items.some((item) => item.key === state.activeIngredient)) state.activeIngredient = items[0]?.key || null;
   $('shopping').hidden = !items.length;
   $('progress').textContent = items.length ? `${items.filter((item) => state.checked[item.key]).length} of ${items.length} ingredients checked off` : 'Import your weekly ingredients to get started.';
-  const select = $('ingredient'); select.replaceChildren();
+  const select = $('ingredient'); select.disabled = batchRunning; select.replaceChildren();
+  $('import-file').disabled = batchRunning; $('clear-list').disabled = batchRunning; $('prepare-batch').disabled = batchRunning;
+  $('scan').disabled = batchRunning;
   const groups = new Map();
   for (const item of items) {
     if (!groups.has(item.section)) { const group = element('optgroup'); group.label = item.section; select.append(group); groups.set(item.section, group); }
@@ -49,11 +56,12 @@ function render() {
   for (const entry of items) {
     if (entry.section !== lastSection) { checklist.append(element('h3', entry.section)); lastSection = entry.section; }
     const row = element('div', null, `check-row ${state.checked[entry.key] ? 'done' : ''}`);
-    const check = element('input'); check.type = 'checkbox'; check.checked = Boolean(state.checked[entry.key]); check.setAttribute('aria-label', `Finished shopping for ${entry.label}`);
+    const check = element('input'); check.type = 'checkbox'; check.checked = Boolean(state.checked[entry.key]); check.disabled = batchRunning; check.setAttribute('aria-label', `Finished shopping for ${entry.label}`);
     check.addEventListener('change', async () => { await save({ checked: { ...state.checked, [entry.key]: check.checked } }); render(); });
     row.append(check, action(entry.label, () => choose(entry.key))); checklist.append(row);
   }
   renderProducts();
+  renderBatch();
 }
 function renderProducts() {
   const item = currentItem();
@@ -94,6 +102,7 @@ function renderProducts() {
         const tab = await activeTab();
         if (!tab || tab.id !== scanned?.tabId || tab.url !== scanned.url) throw new Error('The Morrisons page changed. Read its products again before adding.');
         const [result] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: requestAddOnePack, args: [product.url] });
+        await save({ preferences: { ...state.preferences, [item.key]: { ...product, canAdd: false } } });
         status(result.result.message);
         // A click is not proof of a successful basket update. Never auto-check it off or retry.
         scanned = null; renderProducts();
@@ -104,7 +113,7 @@ function renderProducts() {
   }
 }
 $('ingredient').addEventListener('change', () => choose($('ingredient').value));
-$('search-form').addEventListener('submit', (event) => { event.preventDefault(); openMorrisons(searchUrl($('query').value)).catch((error) => status(error.message)); });
+$('search-form').addEventListener('submit', (event) => { event.preventDefault(); if (batchRunning) return; openMorrisons(searchUrl($('query').value)).catch((error) => status(error.message)); });
 $('scan').addEventListener('click', async () => {
   if (busy) return;
   busy = true; $('scan').disabled = true;
@@ -118,23 +127,139 @@ $('scan').addEventListener('click', async () => {
   } catch (error) { scanned = null; renderProducts(); status(error.message); }
   finally { busy = false; $('scan').disabled = false; }
 });
-$('open-planner').addEventListener('click', () => chrome.tabs.create({ url: APP_ORIGIN + '/week' }));
+$('open-planner').addEventListener('click', () => !batchRunning && chrome.tabs.create({ url: APP_ORIGIN + '/week' }));
 $('import-file').addEventListener('change', async () => {
   try {
+    if (batchRunning) throw new Error('Pause the batch before importing another list.');
     const file = $('import-file').files[0]; if (!file) return;
     if (file.size > 100000) throw new Error('Choose a Weekly Table export smaller than 100KB.');
     const shoppingList = validateImport(JSON.parse(await file.text()));
-    await save({ shoppingList, checked: {}, activeIngredient: null }); scanned = null; render(); status(`${shoppingList.items.length} ingredients imported.`);
+    await save({ shoppingList, checked: {}, activeIngredient: null, batch: null }); draft = null; scanned = null; render(); status(`${shoppingList.items.length} ingredients imported.`);
   } catch (error) { status(error.message); }
   finally { $('import-file').value = ''; }
 });
-$('clear-list').addEventListener('click', async () => { await save({ shoppingList: null, checked: {}, activeIngredient: null }); scanned = null; render(); status('Imported list cleared. Your preferred products are kept.'); });
+$('clear-list').addEventListener('click', async () => { if (batchRunning) return; await save({ shoppingList: null, checked: {}, activeIngredient: null, batch: null }); draft = null; scanned = null; render(); status('Imported list cleared. Your preferred products are kept.'); });
 chrome.storage.onChanged.addListener(async (changes, area) => {
   if (area !== 'local') return;
-  for (const key of ['shoppingList', 'preferences', 'checked', 'activeIngredient']) if (changes[key]) state[key] = changes[key].newValue;
+  for (const key of ['shoppingList', 'preferences', 'checked', 'activeIngredient', 'batch']) if (changes[key]) state[key] = changes[key].newValue;
+  if (changes.preferences || changes.shoppingList) draft = null;
   render();
 });
 chrome.tabs.onUpdated.addListener((tabId, change) => { if (scanned?.tabId === tabId && (change.url || change.status === 'loading')) { scanned = null; renderProducts(); } });
-chrome.tabs.onActivated.addListener(() => { scanned = null; renderProducts(); });
-state = { ...state, ...await chrome.storage.local.get(['shoppingList', 'preferences', 'checked', 'activeIngredient']) };
+chrome.tabs.onActivated.addListener(({ tabId }) => { if (batchRunning && runnerTab != null && tabId !== runnerTab) stopRequested = true; scanned = null; renderProducts(); });
+state = { ...state, ...await chrome.storage.local.get(['shoppingList', 'preferences', 'checked', 'activeIngredient', 'batch']) };
+state.batch = recoverBatch(state.batch);
+if (state.batch) await save({ batch: state.batch });
 render();
+
+function renderBatch() {
+  const review = $('batch-review'); review.replaceChildren();
+  const progress = $('batch-progress'); progress.replaceChildren();
+  const batch = state.batch;
+  $('pause-batch').hidden = !batchRunning;
+  $('resume-batch').hidden = !batch || batchRunning || batch.status === 'complete';
+  $('resume-batch').disabled = Boolean(batch?.rows.some((row) => ['uncertain', 'clicking'].includes(row.status)));
+  $('discard-batch').hidden = !batch || batchRunning;
+  if (batch) {
+    progress.append(element('p', `${batch.rows.filter((row) => row.status === 'done').length} of ${batch.rows.length} products confirmed · ${batch.status}`, 'batch-message'));
+    if (batch.message) progress.append(element('p', batch.message));
+    for (const row of batch.rows) {
+      const line = element('div', null, `batch-row ${row.status}`);
+      line.append(element('strong', `${row.target} pack${row.target === 1 ? '' : 's'} · ${row.name}`), element('small', row.status));
+      if (row.status === 'uncertain') line.append(action('I have checked the basket — allow resume', async () => {
+        row.status = 'queued'; row.attempts = 0;
+        batch.message = 'The next run will read the actual quantity before adding any more.';
+        await save({ batch }); renderBatch();
+      }));
+      progress.append(line);
+    }
+    return;
+  }
+  if (!draft) return;
+  if (draft.missing.length) {
+    review.append(element('p', `${draft.missing.length} ingredients still need a saved product. Choose these before running the whole shop.`));
+    for (const item of draft.missing) review.append(action(`Choose: ${item.label}`, () => choose(item.key)));
+  }
+  for (const row of draft.rows) {
+    const card = element('div', null, 'batch-row');
+    card.append(element('strong', row.name), element('small', row.ingredients.map((item) => item.label).join(' · ')));
+    const label = element('label', 'Total packs wanted in the basket');
+    const input = element('input'); input.type = 'number'; input.min = '1'; input.max = '20'; input.step = '1'; input.value = row.target == null ? '' : String(row.target);
+    input.setAttribute('aria-label', `Packs of ${row.name}`);
+    input.addEventListener('input', () => { row.target = input.value ? Number(input.value) : null; });
+    label.append(input); card.append(label);
+    if (row.target == null) card.append(element('small', 'Enter a pack count; this ingredient cannot be converted automatically.'));
+    review.append(card);
+  }
+  review.append(action('Add reviewed shopping list to basket', async () => {
+    if (draft.missing.length) throw new Error('Choose a saved product for every remaining ingredient first.');
+    const rows = reviewedBatch(draft.rows);
+    const batch = { listId: state.shoppingList.importedAt, status: 'paused', rows, message: '', createdAt: new Date().toISOString() };
+    draft = null; await save({ batch }); await executeBatch(batch);
+  }, !draft.rows.length || draft.missing.length > 0));
+}
+
+async function executeBatch(batch) {
+  if (batchRunning || busy) return;
+  if (batch.listId !== state.shoppingList?.importedAt) throw new Error('This batch belongs to an earlier list. Finish it and review your current list.');
+  for (const row of batch.rows) {
+    if (!['uncertain', 'clicking'].includes(row.status) && row.ingredients.every((item) => state.checked[item.key])) row.status = 'done';
+  }
+  batchRunning = true; busy = true; stopRequested = false; scanned = null;
+  render();
+  try {
+    const tab = await chrome.tabs.create({ url: MORRISONS_ORIGIN + '/', active: true });
+    runnerTab = tab.id;
+    const assertTab = async () => {
+      if (stopRequested) throw new Error('Paused on request. Keep the Morrisons tab selected while running a batch.');
+      const active = await activeTab();
+      if (active?.id !== runnerTab) throw new Error('The shopping tab is no longer selected. Resume with Morrisons ready.');
+    };
+    const inject = async (func, args) => {
+      await assertTab();
+      const [result] = await chrome.scripting.executeScript({ target: { tabId: runnerTab }, func, args });
+      if (!result?.result) throw new Error('Morrisons could not be read. Check the shopping tab before resuming.');
+      return result.result;
+    };
+    const adapter = {
+      persist: async (current) => { await save({ batch: structuredClone(current) }); renderBatch(); },
+      find: async (row) => {
+        await assertTab();
+        await chrome.tabs.update(runnerTab, { url: searchUrl(row.name) });
+        const deadline = Date.now() + 30000;
+        while (Date.now() < deadline) {
+          await assertTab();
+          const tab = await chrome.tabs.get(runnerTab);
+          if (tab.status === 'complete' && !tab.pendingUrl && tab.url?.startsWith(MORRISONS_ORIGIN + '/search') && new URL(tab.url).searchParams.get('q') === row.name.trim().slice(0, 300)) {
+            const observation = await inject(inspectBasketProduct, [row.url]);
+            if (observation.found) {
+              const page = await inject(readMorrisonsPage, []);
+              const current = page.products.find((product) => product.url === row.url);
+              if (row.size && current?.size && row.size.trim().toLowerCase() !== current.size.trim().toLowerCase()) throw new Error(`${row.name} has a different pack size now. Finish this batch and review the product again.`);
+              return;
+            }
+          }
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+        throw new Error(`${row.name} was not found in the current results. Choose a replacement or check Morrisons.`);
+      },
+      inspect: (row) => inject(inspectBasketProduct, [row.url]),
+      increase: (row, before) => inject(increaseBasketProduct, [row.url, before]),
+      complete: async (row) => {
+        const checked = { ...state.checked }; for (const item of row.ingredients) checked[item.key] = true;
+        await save({ checked });
+      },
+    };
+    await runBatch(batch, adapter, () => stopRequested);
+    status(batch.message);
+  } catch (error) {
+    batch.status = 'paused'; batch.message = error.message; await save({ batch }); status(error.message);
+  } finally { batchRunning = false; busy = false; runnerTab = null; render(); }
+}
+$('prepare-batch').addEventListener('click', () => {
+  if (batchRunning || state.batch) return;
+  draft = prepareBatch(state.shoppingList?.items || [], state.preferences, state.checked); renderBatch();
+});
+$('pause-batch').addEventListener('click', () => { stopRequested = true; status('Pausing after the current quantity check. No further Add clicks will start.'); });
+$('resume-batch').addEventListener('click', () => executeBatch(state.batch).catch((error) => status(error.message)));
+$('discard-batch').addEventListener('click', async () => { if (batchRunning) return; await save({ batch: null }); draft = null; renderBatch(); });
