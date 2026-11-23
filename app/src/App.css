@@ -558,6 +558,14 @@ header.top {
 .shopping-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .shopping-actions a { font-weight: 600; padding: 8px 0; }
 .shopping-actions button:disabled { opacity: 0.5; cursor: default; }
+.supermarket-choice { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-weight: 600; margin: 12px 0; }
+.supermarket-choice select, .store-search input { font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); max-width: 100%; }
+.store-search { margin-top: 16px; }
+.store-search > label { display: block; font-size: 13px; margin-bottom: 6px; }
+.store-search input { flex: 1; min-width: 140px; }
+.ingredient-checklist li { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+.ingredient-checklist li > label { flex: 1; min-width: 0; }
+.ingredient-shop { flex-shrink: 0; font-size: 12px; padding: 8px 0; color: var(--olive); }
 .shopping-status { font-size: 13px; color: var(--olive); }
 .copy-list { width: 100%; padding: 10px; font: inherit; background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
 .listgroup h4 { flex-wrap: wrap; }

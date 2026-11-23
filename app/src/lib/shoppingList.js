@@ -125,5 +125,5 @@ export function prepareShoppingList(recipes, selected, excluded = new Set(), vie
     : ['Ingredients by recipe.', '', ...needed.filter((recipe) => recipe.ingredients.length).flatMap((recipe) => [
       `${recipe.title} (serves ${recipe.servings})`, ...recipe.ingredients.map((ingredient) => `• ${ingredient}`), '',
     ])];
-  return { items, remaining, combined, allCombined, sections, allSections, text: ['The Weekly Table — Morrisons shopping list', ...lines].join('\n') };
+  return { items, remaining, combined, allCombined, sections, allSections, text: ['The Weekly Table — shopping list', ...lines].join('\n') };
 }

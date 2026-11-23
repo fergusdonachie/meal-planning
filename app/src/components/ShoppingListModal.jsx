@@ -3,6 +3,7 @@ import { useShopping } from "../context/ShoppingContext";
 import { CUISINE_COLOR } from "../lib/constants";
 import { ingredientKey, prepareShoppingList } from "../lib/shoppingList";
 import { extensionShoppingList, sendShoppingListToExtension, downloadShoppingList } from "../lib/extensionExport";
+import { STORE_KEY, SUPERMARKETS, getSupermarket, ingredientSearchTerm, supermarketSearchUrl } from "../lib/supermarkets";
 
 const PANTRY_KEY = "weeklyTablePantryExcluded";
 function loadExcluded() {
@@ -19,6 +20,11 @@ export default function ShoppingListModal({ recipes, onClose }) {
   const [status, setStatus] = useState("");
   const [manualCopy, setManualCopy] = useState(false);
   const [sending, setSending] = useState(false);
+  const [storeId, setStoreId] = useState(() => {
+    try { return getSupermarket(localStorage.getItem(STORE_KEY)).id; } catch { return getSupermarket().id; }
+  });
+  const [query, setQuery] = useState("");
+  const store = getSupermarket(storeId);
   const modalRef = useRef(null);
   const copyRef = useRef(null);
   const { items, remaining, combined, sections, allSections, text } = prepareShoppingList(recipes, selected, excluded, view);
@@ -28,6 +34,10 @@ export default function ShoppingListModal({ recipes, onClose }) {
   }, [excluded]);
 
   useEffect(() => {
+    try { localStorage.setItem(STORE_KEY, storeId); } catch { /* Storage may be unavailable. */ }
+  }, [storeId]);
+
+  useEffect(() => {
     const previousFocus = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -35,7 +45,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
     function onKey(event) {
       if (event.key === "Escape") onClose();
       if (event.key !== "Tab") return;
-      const focusable = [...modalRef.current.querySelectorAll('button:not(:disabled), a[href], input, textarea')];
+      const focusable = [...modalRef.current.querySelectorAll('button:not(:disabled), a[href], input, textarea, select')];
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
@@ -85,7 +95,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
   async function copyList() {
     try {
       await navigator.clipboard.writeText(text);
-      setStatus("Shopping list copied. Open Morrisons to choose your products.");
+      setStatus(`Shopping list copied. Open ${store.name} to choose your products.`);
     } catch {
       setManualCopy(true);
       setStatus("Select and copy the list below.");
@@ -121,15 +131,27 @@ export default function ShoppingListModal({ recipes, onClose }) {
         {items.length === 0 ? <p className="empty">Nothing selected yet. Add a few meals from the bank first.</p> : <>
           <p className="sub">{items.length} recipes · {view === "combined" ? combined.length : remaining} ingredient entries to buy. Untick anything you already have. Quantities serve {items.every((recipe) => recipe.servings === 2) ? "two per recipe" : "the number shown for each recipe"}.</p>
           <div className="shopping-handoff">
-            <h3>Ready for your Morrisons order</h3>
-            <p>Copy or share your list, then choose products in Morrisons. This opens the shop; it doesn't add items to your basket.</p>
+            <h3>Shop your ingredients</h3>
+            <label className="supermarket-choice">Your supermarket
+              <select value={storeId} onChange={(event) => { setStoreId(event.target.value); setStatus(""); }}>
+                {SUPERMARKETS.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+              </select>
+            </label>
+            <p>Use the search link beside each needed ingredient to find it in {store.name}. Check pack sizes against your list, then add products in the shop. Search links don’t transfer a basket.</p>
             <div className="shopping-actions">
               <button type="button" className="addbtn" disabled={!remaining} onClick={copyList}>Copy shopping list</button>
               <button type="button" className="addbtn" disabled={!remaining} onClick={shareList}>Share list</button>
-              <a href="https://groceries.morrisons.com/" target="_blank" rel="noopener noreferrer">Open Morrisons ↗</a>
+              <a href={store.home} target="_blank" rel="noopener noreferrer">Open {store.name} ↗</a>
+            </div>
+            <div className="store-search">
+              <label htmlFor="store-query">Adjust a search for alternatives or hard-to-find ingredients</label>
+              <div className="shopping-actions">
+                <input id="store-query" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="e.g. skinless chicken thighs" />
+                {query.trim() && <a href={supermarketSearchUrl(storeId, query)} target="_blank" rel="noopener noreferrer">Search {store.name} ↗</a>}
+              </div>
             </div>
           </div>
-          <div className="extension-handoff">
+          {storeId === "morrisons" && <div className="extension-handoff">
             <h3>Shop with the Morrisons browser companion</h3>
             <p>On a laptop or PC, send the combined list to the extension to choose products, save favourites and read current product details.</p>
             <div className="shopping-actions">
@@ -138,7 +160,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
               <a href="/downloads/weekly-table-morrisons.zip" download>Download extension ↧</a>
               <a href="/downloads/morrisons-extension-setup.txt" target="_blank" rel="noopener noreferrer">Setup instructions ↗</a>
             </div>
-          </div>
+          </div>}
           <p className="shopping-status" role="status">{status}</p>
           {manualCopy && <textarea ref={copyRef} className="copy-list" aria-label="Shopping list to copy" readOnly value={text} rows={8} />}
           <div className="shopping-view" role="group" aria-label="Shopping list view">
@@ -158,6 +180,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
                 <label><input type="checkbox" checked={included} onChange={() => toggleCombined(entry)} />
                   <span>{needed?.label || entry.label}<small>{titles.join(" · ")}</small></span>
                 </label>
+                {included && <a className="ingredient-shop" href={supermarketSearchUrl(storeId, ingredientSearchTerm(needed.name))} target="_blank" rel="noopener noreferrer" aria-label={`Search ${store.name} for ${needed.name}`}>Search ↗</a>}
               </li>;
             })}
             </ul>
@@ -170,6 +193,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
                   const included = !excluded.has(key);
                   return <li key={ingredient} className={included ? "" : "in-pantry"}>
                     <label><input type="checkbox" checked={included} onChange={() => toggleIngredient(key)} /> <span>{ingredient}</span></label>
+                    {included && <a className="ingredient-shop" href={supermarketSearchUrl(storeId, ingredientSearchTerm(ingredient))} target="_blank" rel="noopener noreferrer" aria-label={`Search ${store.name} for ${ingredientSearchTerm(ingredient)}`}>Search ↗</a>}
                   </li>;
                 })}
               </ul>
