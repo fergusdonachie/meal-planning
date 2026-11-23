@@ -592,3 +592,56 @@ header.top {
     display: none;
   }
 }
+
+.week-calendar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 22px; }
+.week-calendar .addbtn { flex: 0 0 44px; }
+.week-calendar strong { font-size: 18px; }
+.menu-proposal { padding: 24px; background: var(--olive-soft); border-radius: 16px; margin-bottom: 28px; }
+.proposal-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.proposal-heading h2 { margin: 0; }
+.proposal-heading label { display: flex; align-items: center; gap: 8px; }
+.proposal-heading select, .swap-picker select { font: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-width: 100%; }
+.suggested-meals { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 12px; }
+.suggested-meals li { display: flex; gap: 14px; align-items: center; }
+.suggested-meals .suggestion-photo { width: 88px; height: 66px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
+.suggested-meals a { font-weight: 700; }
+.suggested-meals small { display: block; margin-top: 4px; color: var(--ink-soft); }
+.swap-picker { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 12px; }
+.swap-picker label { display: block; margin-bottom: 8px; }
+.swap-picker select { width: 100%; }
+.recipe-card-actions, .cooking-toolbar, .cooking-step-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 22px 0; }
+.recipe-card-actions button, .cooking-toolbar button, .cooking-step-actions button { flex: 0 1 auto; min-height: 44px; }
+.cooking-card h1 { font: 600 clamp(28px, 5vw, 44px) 'Fraunces', serif; }
+.cooking-layout { display: grid; grid-template-columns: minmax(230px, 1fr) minmax(0, 1.65fr); gap: 32px; margin-top: 28px; }
+.cooking-ingredients { padding: 22px; background: var(--olive-soft); border-radius: 16px; }
+.cooking-ingredients h2 { margin-top: 0; }
+.cooking-ingredients ul { list-style: none; padding: 0; }
+.cooking-ingredients label { display: flex; gap: 12px; align-items: baseline; padding: 10px 0; line-height: 1.5; cursor: pointer; }
+.cooking-ingredients input { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--olive); }
+.cooking-ingredients .prepared span { text-decoration: line-through; color: var(--ink-soft); }
+.cooking-method { position: sticky; top: 20px; align-self: start; padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+.cooking-method progress { width: 100%; accent-color: var(--olive); }
+.cooking-instruction { font-size: clamp(22px, 3vw, 30px); line-height: 1.6; min-height: 150px; }
+.cooking-step-actions button:disabled { opacity: .5; cursor: default; }
+.all-steps { margin-top: 20px; line-height: 1.7; }
+.all-steps summary { cursor: pointer; font-weight: 700; }
+.all-steps li { margin-bottom: 12px; }
+@media (max-width: 680px) {
+  .cooking-layout { grid-template-columns: 1fr; gap: 18px; }
+  .cooking-method { position: static; }
+  .cooking-ingredients { order: 1; }
+  .cooking-instruction { min-height: 100px; }
+  .menu-proposal { padding: 18px; }
+}
+@media print {
+  .app-navigation, .shopbar, .backlink, .detail-addbtn, .detail-cooked, .recipe-card-actions, .cooking-toolbar { display: none !important; }
+  .wrap { padding: 0; max-width: none; }
+  .detail-media { display: none; }
+  .detail-grid { display: block; }
+  .detail-grid li { break-inside: avoid; }
+  body { background: white; color: black; }
+}
+.primary-action { font: 700 15px 'Karla', sans-serif; border: 1px solid var(--olive); border-radius: 9px; padding: 12px 18px; background: var(--olive); color: var(--cream); cursor: pointer; min-height: 44px; }
+.primary-action:disabled { opacity: .6; cursor: default; }
+.cooking-toolbar [aria-pressed="true"] { background: var(--olive); color: var(--cream); }
+.storage-warning { max-width: 1180px; margin: 12px auto; padding: 16px; background: var(--terracotta-soft); color: var(--ink); border-radius: 10px; }

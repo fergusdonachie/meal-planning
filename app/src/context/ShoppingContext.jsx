@@ -1,47 +1,42 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
-import { PLAN_STORAGE_KEY, restorePlan, updatePlan } from "../lib/weekPlan";
+import { createContext, useContext, useEffect, useReducer, useState } from "react";
+import { validWeek } from "../lib/weeklyMenu";
+import { PLAN_STORAGE_KEY, restorePlan } from "../lib/weekPlan";
+import { PLANNER_KEY, restorePlanner, serializePlanner, updatePlanner } from "../lib/weeklyPlanner";
 
-const STORAGE_KEY = "weeklyTableSelected";
 const ShoppingContext = createContext(null);
-
+function readSaved(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key) || "null") ?? fallback; } catch { return fallback; }
+}
 function loadSaved() {
+  const saved = readSaved(PLANNER_KEY, null);
+  const oldPlan = readSaved(PLAN_STORAGE_KEY, null);
+  const legacy = readSaved("weeklyTableSelected", []);
+  const planner = restorePlanner(saved, oldPlan || { selected: legacy });
   try {
-    const saved = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) || "null");
-    const legacy = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return restorePlan(saved, legacy);
-  } catch {
-    return restorePlan(null);
-  }
+    const viewed = sessionStorage.getItem("weeklyTableViewedWeek");
+    return validWeek(viewed) ? { ...planner, week: viewed } : planner;
+  } catch { return planner; }
 }
 
 export function ShoppingProvider({ children }) {
-  const [plan, dispatch] = useReducer(updatePlan, null, loadSaved);
-  const { selected, completed } = plan;
-
+  const [planner, dispatch] = useReducer(updatePlanner, null, loadSaved);
+  const [storageFailed, setStorageFailed] = useState(false);
+  const { selected, completed } = planner.weeks[planner.week] || restorePlan(null);
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...selected]));
-      localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify({ selected: [...selected], completed: [...completed] }));
-    } catch {
-      // localStorage unavailable (private mode etc.) — selection just won't persist
-    }
-  }, [selected, completed]);
-
-  function toggle(id) {
-    dispatch({ type: "toggle", id });
-  }
-
-  function clear() {
-    dispatch({ type: "clear" });
-  }
-
-  return (
-    <ShoppingContext.Provider value={{ selected, completed, toggle, clear, toggleCompleted: (id) => dispatch({ type: "complete", id }) }}>
-      {children}
-    </ShoppingContext.Provider>
-  );
+    // eslint-disable-next-line react/set-state-in-effect -- Report a failure from the external storage system.
+    try { localStorage.setItem(PLANNER_KEY, JSON.stringify(serializePlanner(planner))); } catch { setStorageFailed(true); }
+    try { sessionStorage.setItem("weeklyTableViewedWeek", planner.week); } catch { /* The saved menu is still available in local storage. */ }
+  }, [planner]);
+  return <ShoppingContext.Provider value={{
+    selected, completed, week: planner.week, weeks: planner.weeks,
+    toggle: (id) => dispatch({ type: "toggle", id }),
+    clear: () => dispatch({ type: "clear" }),
+    toggleCompleted: (id) => dispatch({ type: "complete", id }),
+    changeWeek: (week) => dispatch({ type: "week", week }),
+    setMeals: (ids) => dispatch({ type: "replace", ids }),
+    swapMeal: (id, replacement) => dispatch({ type: "swap", id, replacement }),
+  }}>{storageFailed && <p className="storage-warning" role="status">This browser had trouble saving your menu. Keep this tab open; changes may be lost when you close it.</p>}{children}</ShoppingContext.Provider>;
 }
-
 export function useShopping() {
   const ctx = useContext(ShoppingContext);
   if (!ctx) throw new Error("useShopping must be used within ShoppingProvider");

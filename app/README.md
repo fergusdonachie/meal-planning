@@ -21,11 +21,16 @@ Production points at `fergusdonachie/meal-planning@main`. To point production at
 
 ## Weekly cooking and private household access
 
-`/week` shows your selected recipe cards, cooked ticks, cooking progress, and a
-new-week reset. Plans are saved locally in each browser; shared passwords do not
+`/` opens `/week`, with Monday–Sunday menus, four or five suggested dinners,
+individual swaps and cooked ticks. `/recipes` opens the full recipe bank. Each
+week is saved separately. Recipe cards include a focused cooking mode with
+ingredient ticks, saved step progress, optional screen wake lock and a print view. Plans are saved locally in each browser; shared passwords do not
 sync a household menu between devices.
 
-Production is gated by server-side shared-password authentication. Before
+Production is gated by server-side authentication. Email sign-in links restricted
+to approved household addresses are implemented but need Supabase Auth/email
+delivery setup and `APP_AUTH_MODE=email` before activation. The existing password
+gate stays active during that migration. Before
 deploying, configure `APP_PASSWORD` and `APP_SESSION_SECRET` in Vercel for both
 Production and Preview. See `../docs/private-access.md` for the full setup and
 verification steps. Missing configuration blocks access. Local Vite development

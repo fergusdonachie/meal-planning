@@ -1,4 +1,5 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import CookingCard from "../components/CookingCard";
 import RecipeImage from "../components/RecipeImage";
 import SpiceDots from "../components/SpiceDots";
 import { useShopping } from "../context/ShoppingContext";
@@ -6,24 +7,27 @@ import { CUISINE_COLOR } from "../lib/constants";
 
 export default function RecipeDetail({ recipes }) {
   const { id } = useParams();
-  const { selected, completed, toggle, toggleCompleted } = useShopping();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { week, selected, completed, toggle, toggleCompleted } = useShopping();
   const recipe = recipes.find((r) => r.id === id);
 
   if (!recipe) {
     return (
       <div className="detail-notfound">
         <p>Couldn't find that recipe.</p>
-        <Link to="/">← Back to the recipe bank</Link>
+        <Link to="/recipes">← Back to the recipe bank</Link>
       </div>
     );
   }
+
+  if (searchParams.get("cook") === "1") return <CookingCard key={`${week}:${recipe.id}`} recipe={recipe} onClose={() => setSearchParams({})} />;
 
   const color = CUISINE_COLOR[recipe.cuisine];
   const added = selected.has(recipe.id);
 
   return (
     <article className="detail">
-      <Link to={added ? "/week" : "/"} className="backlink">← {added ? "This week's recipes" : "Back to the recipe bank"}</Link>
+      <Link to={added ? "/week" : "/recipes"} className="backlink">← {added ? "This week's recipes" : "Back to the recipe bank"}</Link>
       <div className="detail-media">
         <RecipeImage key={recipe.image} recipe={recipe} className="detail-image" />
         {recipe.imageSource === "ai" && <span className="image-credit">AI-generated image</span>}
@@ -50,6 +54,8 @@ export default function RecipeDetail({ recipes }) {
         {added ? "✓ Added to shopping list" : "+ Add to shopping list"}
       </button>
       {added && <label className="cooked-toggle detail-cooked"><input type="checkbox" checked={completed.has(recipe.id)} onChange={() => toggleCompleted(recipe.id)} /> I've cooked this meal</label>}
+
+      <div className="recipe-card-actions"><button type="button" className="primary-action" onClick={() => setSearchParams({ cook: "1" })}>Start cooking →</button><button type="button" className="addbtn" onClick={() => window.print()}>Print recipe card</button></div>
 
       <div className="detail-grid">
         <section>

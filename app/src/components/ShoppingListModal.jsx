@@ -3,6 +3,7 @@ import { useShopping } from "../context/ShoppingContext";
 import { CUISINE_COLOR } from "../lib/constants";
 import { ingredientKey, prepareShoppingList } from "../lib/shoppingList";
 import { extensionShoppingList, sendShoppingListToExtension, downloadShoppingList } from "../lib/extensionExport";
+import { weekLabel } from "../lib/weeklyMenu";
 import { STORE_KEY, SUPERMARKETS, getSupermarket, ingredientSearchTerm, supermarketSearchUrl } from "../lib/supermarkets";
 
 const PANTRY_KEY = "weeklyTablePantryExcluded";
@@ -14,7 +15,7 @@ function loadExcluded() {
 }
 
 export default function ShoppingListModal({ recipes, onClose }) {
-  const { selected } = useShopping();
+  const { selected, week } = useShopping();
   const [excluded, setExcluded] = useState(loadExcluded);
   const [view, setView] = useState("combined");
   const [status, setStatus] = useState("");
@@ -27,7 +28,9 @@ export default function ShoppingListModal({ recipes, onClose }) {
   const store = getSupermarket(storeId);
   const modalRef = useRef(null);
   const copyRef = useRef(null);
-  const { items, remaining, combined, sections, allSections, text } = prepareShoppingList(recipes, selected, excluded, view);
+  const { items, remaining, combined, sections, allSections, text: listText } = prepareShoppingList(recipes, selected, excluded, view);
+
+  const text = `Week: ${weekLabel(week)}\n${listText}`;
 
   useEffect(() => {
     try { localStorage.setItem(PANTRY_KEY, JSON.stringify([...excluded])); } catch { /* Storage may be unavailable. */ }
@@ -127,9 +130,10 @@ export default function ShoppingListModal({ recipes, onClose }) {
     <div className="modal-overlay open" onClick={(event) => event.target === event.currentTarget && onClose()}>
       <div className="modal" ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="shopping-title">
         <button type="button" className="close-btn" aria-label="Close shopping list" onClick={onClose}>×</button>
-        <h2 id="shopping-title">This week's shopping list</h2>
+        <h2 id="shopping-title">Your weekly shopping list</h2>
+        <p className="recipe-note">{weekLabel(week)}</p>
         {items.length === 0 ? <p className="empty">Nothing selected yet. Add a few meals from the bank first.</p> : <>
-          <p className="sub">{items.length} recipes · {view === "combined" ? combined.length : remaining} ingredient entries to buy. Untick anything you already have. Quantities serve {items.every((recipe) => recipe.servings === 2) ? "two per recipe" : "the number shown for each recipe"}.</p>
+          <p className="sub">{items.length} recipe{items.length === 1 ? "" : "s"} · {view === "combined" ? combined.length : remaining} ingredient entries to buy. Untick anything you already have. Quantities serve {items.every((recipe) => recipe.servings === 2) ? "two per recipe" : "the number shown for each recipe"}.</p>
           <div className="shopping-handoff">
             <h3>Shop your ingredients</h3>
             <label className="supermarket-choice">Your supermarket

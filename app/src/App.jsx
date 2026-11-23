@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import { useRecipes } from "./hooks/useRecipes";
 import { ShoppingProvider } from "./context/ShoppingContext";
@@ -13,6 +13,8 @@ import { RECIPES_URL } from "./lib/github";
 
 export default function App() {
   const { recipes, error, loading } = useRecipes();
+  const location = useLocation();
+  const cooking = location.pathname.startsWith("/recipe/") && new URLSearchParams(location.search).get("cook") === "1";
   const [modalOpen, setModalOpen] = useState(false);
 
   if (loading) {
@@ -38,14 +40,15 @@ export default function App() {
   return (
     <ShoppingProvider>
       <div className="wrap">
-        <AppNavigation />
+        {!cooking && <AppNavigation />}
         <Routes>
-          <Route path="/" element={<Home recipes={recipes} />} />
+          <Route path="/" element={<Navigate to="/week" replace />} />
+          <Route path="/recipes" element={<Home recipes={recipes} />} />
           <Route path="/week" element={<Week recipes={recipes} onShopping={() => setModalOpen(true)} />} />
           <Route path="/recipe/:id" element={<RecipeDetail recipes={recipes} />} />
         </Routes>
       </div>
-      <ShoppingBar recipes={recipes} onView={() => setModalOpen(true)} />
+      {!cooking && <ShoppingBar recipes={recipes} onView={() => setModalOpen(true)} />}
       {modalOpen && <ShoppingListModal recipes={recipes} onClose={() => setModalOpen(false)} />}
     </ShoppingProvider>
   );

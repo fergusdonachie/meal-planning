@@ -55,9 +55,9 @@ Each recipe is an object with:
 
 ## Private household access
 
-Selected recipe cards live at `/week`, with saved cooked ticks and a new-week reset. Menus are stored per browser and do not yet sync between devices.
+The app opens at `/week`, with dated weekly menus, four or five suggested dinners, individual swaps and saved cooked ticks. Browse all recipes at `/recipes`. Cooking mode offers ingredient ticks, saved steps and optional screen wake lock. Menus are stored per browser and do not yet sync between devices.
 
-The app includes a server-side shared-password gate on Vercel. Set `APP_PASSWORD` and `APP_SESSION_SECRET` before deploying; see `docs/private-access.md`. Missing settings block access. Future Pepesto credentials must stay in server-only environment variables.
+The app includes a server-side access gate on Vercel. Email links restricted to the household allowlist are implemented and require Supabase Auth and email delivery configuration before activation. During migration the existing password gate stays active. See `docs/private-access.md` for setup and verification. Missing settings block access. Future Pepesto credentials must stay in server-only environment variables.
 
 ## Deploying `app/` to Vercel
 

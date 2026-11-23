@@ -1,9 +1,90 @@
-# Household password and weekly recipe cards
+# Household access and weekly recipe cards
 
-The new `/week` page keeps selected recipe cards together, separates meals still
-to cook from completed meals, and offers cooked ticks and an explicit new-week reset.
-Existing selections migrate automatically. Menus and completion are stored in
-each browser's local storage; they do not sync across phones or computers.
+The home page opens the weekly menu at `/week`; the bank lives at `/recipes`.
+Plans use Monday–Sunday weeks in Europe/London, offer four or five varied suggested
+dinners, and allow individual uncooked meals to be swapped. Suggestions avoid the
+previous week's chosen recipes when possible. Each week is stored separately;
+clearing or replacing a menu does not change other weeks. Existing selections
+migrate into the current week on first use.
+
+Recipe cards offer a focused cooking mode (`?cook=1`), ingredient preparation
+ticks, one step at a time, previous/next controls and a cooked button on the final
+step. Cooking progress is saved per recipe and week. Screen wake lock is optional
+and browser-dependent; it is released when leaving the cooking card. Full recipe
+cards can also be printed.
+
+Menus, cooked ticks and cooking progress are stored locally per browser. They do
+not yet sync across phones or computers. Signing into the same household does
+not itself provide data synchronisation.
+
+## Password-free household access (ready to configure)
+
+The app supports email sign-in links with Supabase Auth. Activation is deliberately
+separate from deployment: until `APP_AUTH_MODE=email` is configured, the existing
+password gate remains active. Email mode never falls back to a password or public
+access when its settings are missing. Existing password cookies are rejected
+once email mode is enabled.
+
+The household allowlist lives only in server environment variables. Both sending
+a link and creating a session require an approved address; a confirmed provider
+identity is required at verification. Links are verified and consumed by Supabase,
+not by trusting an email supplied by the browser. The app stores only its own
+signed HttpOnly session cookie, valid for up to 90 days. Provider access and refresh
+tokens are not stored in browser storage. Removing an allowed email or rotating
+`APP_SESSION_SECRET` revokes existing email sessions on the next request.
+
+### Setup before activation
+
+1. Create a Supabase project. Enable its email authentication provider. Set its
+   **Site URL** to `https://fd-meal-planner.vercel.app` (no trailing slash).
+2. Add the two household users as confirmed users in Supabase Auth. The app sends
+   OTP requests with `create_user: false`, so it never signs up new people.
+   Disable public user sign-ups in Supabase. Use the dashboard's Add User flow or
+   its server-only admin API; the household will never type a password into this app.
+3. Configure a working SMTP sender in Supabase, and verify delivery to both
+   approved addresses. Supabase's default email sender restricts recipients and
+   is unsuitable as a general production delivery service. Never put SMTP secrets
+   in this repository or the frontend.
+4. In **Authentication → Email Templates → Magic Link**, use this link:
+
+   ```html
+   <h2>Your household table</h2>
+   <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Open The Weekly Table</a></p>
+   ```
+
+   Set an appropriate short OTP expiry, such as 15 minutes. Disable email-provider
+   click tracking, which can rewrite sign-in links. The app displays a confirmation
+   button before consuming the link, so a mail scanner's GET does not sign anyone in.
+5. Configure these server-only Vercel variables for the intended deployment:
+
+   | Variable | Value |
+   | --- | --- |
+   | `APP_ALLOWED_EMAILS` | The two approved addresses, separated by a comma. No addresses are committed to GitHub. |
+   | `SUPABASE_URL` | The project's HTTPS base URL. |
+   | `SUPABASE_ANON_KEY` | Its public legacy anon key, used by the server for Auth requests. A service-role key is not needed by the app. |
+   | `APP_SESSION_SECRET` | Keep the existing independent secret of at least 32 characters, or rotate it to revoke all sessions. |
+   | `APP_AUTH_MODE` | Set to `email` only when the provider and delivery tests are ready. |
+
+6. Add Vercel Firewall rate limits to POST `/auth/login` and `/auth/confirm` to
+   complement Supabase's Auth rate limits. The app does not use an in-memory rate
+   limiter that would reset across Vercel instances. Unknown addresses receive
+   the same response and trigger no outbound email. Login responses do not reveal
+   household membership, provider errors or secrets.
+7. Redeploy and verify an email can sign in on each phone. Confirm that a reused
+   link is rejected, unknown addresses cannot sign in, private pages and images
+   redirect without a session, and Sign out clears access. Keep the old password
+   settings until the migration succeeds; they are ignored in email mode.
+
+Live email delivery cannot be tested until this project and its sender are
+configured. Local tests mock provider responses and cover verification, allowlist
+checks, sessions, revocation, CSRF, expired links and fail-closed behaviour.
+Local Vite development does not run this production access middleware.
+
+Sources checked 23 November 2026:
+
+- https://supabase.com/docs/guides/auth/auth-email-passwordless
+- https://supabase.com/docs/guides/auth/auth-smtp
+- https://supabase.com/docs/guides/auth/rate-limits
 
 ## Enable shared-password access on Vercel
 

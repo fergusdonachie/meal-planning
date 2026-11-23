@@ -1,3 +1,4 @@
+import { emailAuthenticated, protectEmailRequest } from './email-auth.js';
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const SESSION_SECONDS = 30 * 24 * 60 * 60;
@@ -32,6 +33,8 @@ export function createSession(env, now = Date.now()) {
 }
 
 export function isAuthenticated(request, env, now = Date.now()) {
+  if (env.APP_AUTH_MODE === 'email') return emailAuthenticated(request, env, now);
+  if (env.APP_AUTH_MODE && env.APP_AUTH_MODE !== 'password') return false;
   if (!configured(env)) return false;
   const cookie = (request.headers.get('cookie') || '').split(';').map((part) => part.trim()).find((part) => part.startsWith(`${COOKIE}=`));
   if (!cookie) return false;
@@ -74,6 +77,8 @@ function loginPage(path, error = false) {
 
 // null means the request may proceed. This also protects API routes and assets.
 export async function protectRequest(request, env = process.env) {
+  if (env.APP_AUTH_MODE === 'email') return protectEmailRequest(request, env);
+  if (env.APP_AUTH_MODE && env.APP_AUTH_MODE !== 'password') return response('Unknown private access mode.', 503);
   if (!configured(env)) return response('Private access is not configured. Set the household password and session secret before deploying.', 503);
   const url = new URL(request.url);
   const path = url.pathname;

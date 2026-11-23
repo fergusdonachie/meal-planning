@@ -2,7 +2,7 @@ import { useShopping } from "../context/ShoppingContext";
 import { Link } from "react-router-dom";
 
 export default function ShoppingBar({ recipes, onView }) {
-  const { selected, clear } = useShopping();
+  const { selected } = useShopping();
   const n = selected.size;
   if (n === 0) return null;
 
@@ -17,8 +17,7 @@ export default function ShoppingBar({ recipes, onView }) {
             {fishCount > 0 ? `${fishCount} fish meal${fishCount > 1 ? "s" : ""} included` : "No fish selected yet — aim for at least one"}
           </span>
         </div>
-        <button type="button" className="clearbtn" onClick={clear}>Clear</button>
-        <Link className="week-bar-link" to="/week">Cook this week's meals →</Link>
+        <Link className="week-bar-link" to="/week">Open weekly menu →</Link>
         <button type="button" className="viewbtn" onClick={onView}>View shopping list</button>
       </div>
     </div>
