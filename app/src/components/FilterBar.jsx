@@ -1,4 +1,5 @@
 import { CUISINES, PROTEINS } from "../lib/constants";
+import { useState } from "react";
 
 const TIME_OPTIONS = [
   { value: 20, label: "≤20 min" },
@@ -6,9 +7,20 @@ const TIME_OPTIONS = [
   { value: 99, label: "Any time" },
 ];
 
-export default function FilterBar({ filters, onToggleCuisine, onToggleProtein, onSetTime, onSearch, onReset }) {
+export default function FilterBar({ filters, onToggleCuisine, onToggleProtein, onSetTime, onSearch, onReset, onSetCookingMethod }) {
+  const [expanded, setExpanded] = useState(false);
+  const active = filters.cuisine.size + filters.protein.size + Number(Boolean(filters.time)) + Number(Boolean(filters.cookingMethod));
   return (
     <div className="filterbar">
+      <div className="filter-summary">
+        <button type="button" className="addbtn" aria-expanded={expanded} aria-controls="recipe-filter-options" onClick={() => setExpanded(!expanded)}>{expanded ? "Hide filters" : "Show filters"}{active > 0 ? ` (${active})` : ""}</button>
+        <label className="bank-search"><span className="sr-only">Search recipes</span><input type="search" placeholder="Search ingredient or dish…" value={filters.search} onChange={(event) => onSearch(event.target.value)} /></label>
+        {(active > 0 || filters.search) && <button type="button" className="resetbtn compact-reset" aria-label="Reset filters" onClick={onReset}>Reset</button>}
+      </div>
+      <div id="recipe-filter-options" hidden={!expanded}>
+      <div className="filterrow">
+        <label className="cooking-filter">Cooking <select aria-label="Cooking method" value={filters.cookingMethod} onChange={(event) => onSetCookingMethod(event.target.value)}><option value="">Any method</option><option value="single">One pot / one tray</option><option value="One pot">One pot · hob</option><option value="One tray">One tray · oven</option></select></label>
+      </div>
       <div className="filterrow">
         <span className="flabel">Cuisine</span>
         {CUISINES.map((c) => (
@@ -50,21 +62,10 @@ export default function FilterBar({ filters, onToggleCuisine, onToggleProtein, o
             {t.label}
           </button>
         ))}
-        <div className="searchwrap">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="7" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search ingredient or dish…"
-            value={filters.search}
-            onChange={(e) => onSearch(e.target.value)}
-          />
-        </div>
         <button type="button" className="resetbtn" onClick={onReset}>
           Reset filters
         </button>
+      </div>
       </div>
     </div>
   );

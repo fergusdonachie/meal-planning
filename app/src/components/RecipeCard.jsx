@@ -28,6 +28,7 @@ export default function RecipeCard({ recipe }) {
             {recipe.fish ? <span className="fish-badge">🐟 Fish</span> : <span className="protein-badge">{recipe.protein}</span>}
           </span>
           <span className="m">⏱ {recipe.time} min</span>
+          {recipe.cookingMethod && <span className="m">{recipe.cookingMethod}</span>}
           <span className="m">~{recipe.kcal} kcal</span>
           <span className="m"><SpiceDots level={recipe.spice} /></span>
         </div>

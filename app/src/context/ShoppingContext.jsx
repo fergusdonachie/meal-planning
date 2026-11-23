@@ -31,7 +31,12 @@ export function ShoppingProvider({ children }) {
     clear: () => sync.dispatch({ type: "clear" }),
     toggleCompleted: (id) => sync.dispatch({ type: "complete", id }),
     changeWeek: sync.changeWeek,
-    setMeals: (ids) => sync.dispatch({ type: "replace", ids }),
+    setMeals: (ids, keepCooked = false) => {
+      if (!keepCooked) { sync.dispatch({ type: "replace", ids }); return; }
+      // Finish a partially chosen draft without resetting its existing cooked ticks.
+      for (const id of selected) if (!ids.includes(id)) sync.dispatch({ type: "select", id, value: false });
+      for (const id of ids) if (!selected.has(id)) sync.dispatch({ type: "select", id, value: true });
+    },
     swapMeal: (id, replacement) => sync.dispatch({ type: "swap", id, replacement }),
   }}>
     <p className={`household-sync ${status === "offline" || status === "signed-out" ? "sync-pending" : ""}`} role="status">{message} {status === "signed-out" ? <a href="/auth/login">Sign in</a> : status === "offline" && <button type="button" className="week-reset" onClick={() => void sync.refresh()}>Retry now</button>}</p>

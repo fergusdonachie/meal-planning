@@ -1,28 +1,52 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import RecipeImage from "../components/RecipeImage";
 import { useShopping } from "../context/ShoppingContext";
 import { currentWeek, shiftWeek, suggestMeals, weekLabel } from "../lib/weeklyMenu";
+import { matchesCookingMethod } from "../lib/recipeFilters";
 
 export default function Week({ recipes, onShopping }) {
+  const { week } = useShopping();
+  return <WeekView key={week} recipes={recipes} onShopping={onShopping} />;
+}
+
+function WeekView({ recipes, onShopping }) {
   const { selected, completed, toggleCompleted, clear, week, weeks, changeWeek, setMeals, swapMeal } = useShopping();
-  const [count, setCount] = useState(5);
-  const [variation, setVariation] = useState(0);
-  const [proposing, setProposing] = useState(false);
+  const draftKey = `weeklyTableSuggestions:${week}`;
+  function buildDraft(options) {
+    const pool = recipes.filter((recipe) => matchesCookingMethod(recipe, options.onePan ? "single" : ""));
+    return { ...options, ids: suggestMeals(pool, week, options.count, [...(weeks[shiftWeek(week, -1)]?.selected || [])], options.variation) };
+  }
+  const [draft, setDraft] = useState(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(draftKey));
+      if ([4, 5].includes(saved?.count) && Array.isArray(saved.ids) && saved.ids.length && saved.ids.every((id) => recipes.some((recipe) => recipe.id === id))) return saved;
+    } catch { /* Start a new draft if browser storage is unavailable. */ }
+    return buildDraft({ count: 5, variation: 0, onePan: false, open: false, replace: false });
+  });
+  useEffect(() => { try { sessionStorage.setItem(draftKey, JSON.stringify(draft)); } catch { /* Navigation still works without saved suggestions. */ } }, [draftKey, draft]);
+  const { count, onePan, ids: suggestions, open: proposing } = draft;
+  function setProposing(open) { setDraft((previous) => ({ ...previous, open, replace: open ? selected.size > 0 : previous.replace })); }
+  function changeSuggestions(changes) { setDraft((previous) => buildDraft({ ...previous, ...changes })); }
+  function openSuggestion() {
+    const next = { ...draft, open: true };
+    // Persist before Link navigation unmounts this screen and cancels its effect.
+    try { sessionStorage.setItem(draftKey, JSON.stringify(next)); } catch { /* Optional browser storage. */ }
+    setDraft(next);
+  }
   const [swapping, setSwapping] = useState(null);
   const [confirmReset, setConfirmReset] = useState(false);
   const [notice, setNotice] = useState("");
   const meals = [...selected].map((id) => recipes.find((recipe) => recipe.id === id)).filter(Boolean);
   const pending = meals.filter((recipe) => !completed.has(recipe.id));
   const cooked = meals.filter((recipe) => completed.has(recipe.id));
-  const suggestions = useMemo(() => suggestMeals(recipes, week, count, [...(weeks[shiftWeek(week, -1)]?.selected || [])], variation), [recipes, week, count, weeks, variation]);
   const preview = suggestions.map((id) => recipes.find((recipe) => recipe.id === id));
-  const swapOptions = recipes.filter((recipe) => !selected.has(recipe.id)).sort((a, b) => {
+  const swapOptions = recipes.filter((recipe) => !selected.has(recipe.id) && matchesCookingMethod(recipe, onePan ? "single" : "")).sort((a, b) => {
     const original = recipes.find((recipe) => recipe.id === swapping);
     return Number(b.protein === original?.protein) - Number(a.protein === original?.protein) || a.time - b.time || a.title.localeCompare(b.title);
   });
 
-  function navigateWeek(next) { changeWeek(next); setProposing(false); setSwapping(null); setConfirmReset(false); setNotice(""); }
+  function navigateWeek(next) { changeWeek(next); }
   function renderCard(recipe) {
     const done = completed.has(recipe.id);
     return <article className={`card week-card ${done ? "cooked" : ""}`} key={recipe.id}>
@@ -83,17 +107,18 @@ export default function Week({ recipes, onShopping }) {
     </div>}
     {(!meals.length || proposing) && <section className="menu-proposal" aria-labelledby="suggested-menu">
       <div className="proposal-heading"><div><p className="eyebrow">A starting point for your week</p><h2 id="suggested-menu">How about these dinners?</h2></div>
-        <label>Dinners <select value={count} onChange={(event) => setCount(Number(event.target.value))}><option value={4}>4 dinners</option><option value={5}>5 dinners</option></select></label>
+        <label>Dinners <select value={count} onChange={(event) => changeSuggestions({ count: Number(event.target.value) })}><option value={4}>4 dinners</option><option value={5}>5 dinners</option></select></label>
       </div>
-      <p>Fish, chicken and vegetarian choices across the cuisines you enjoy. Suggestions favour meals under 40 minutes and avoid last week's choices where possible.</p>
+      <label className="single-vessel-choice"><input type="checkbox" checked={onePan} onChange={(event) => changeSuggestions({ onePan: event.target.checked })} /> One pot / one tray meals only</label>
+      <p>{onePan ? "Complete dinners cooked in one pot on the hob or one roasting tray in the oven. Fish, chicken and vegetarian choices where available." : "Fish, chicken and vegetarian choices across the cuisines you enjoy. Suggestions favour meals under 40 minutes and avoid last week's choices where possible."}</p>
       <ol className="suggested-meals">{preview.map((recipe) => <li key={recipe.id}>
         <RecipeImage recipe={recipe} className="suggestion-photo" />
-        <div><Link to={`/recipe/${recipe.id}`}>{recipe.title}</Link><small>{recipe.time} min · {recipe.protein} · {recipe.cuisine}</small></div>
+        <div><Link to={`/recipe/${recipe.id}?from=suggestions&count=${count}`} onClick={openSuggestion}>{recipe.title}</Link><small>{recipe.time} min · {recipe.protein} · {recipe.cookingMethod || recipe.cuisine}{selected.has(recipe.id) ? " · ✓ Added to this week" : ""}</small></div>
       </li>)}</ol>
       <p className="recipe-note">Recipe pictures are AI-generated illustrations.</p>
-      {meals.length > 0 && <p className="recipe-note">Using these suggestions replaces this week's menu and resets its cooked ticks.</p>}
-      <div className="shopping-actions"><button type="button" className="primary-action" onClick={() => { setMeals(suggestions); setProposing(false); setNotice("Menu saved. You can swap any dinner below."); }}>Use these {preview.length} dinners</button>
-        <button type="button" className="addbtn" onClick={() => setVariation((value) => value + 1)}>Try other suggestions</button></div>
+      {meals.length > 0 && draft.replace && <p className="recipe-note">Using these suggestions replaces this week's menu and resets its cooked ticks.</p>}
+      <div className="shopping-actions"><button type="button" className="primary-action" onClick={() => { setMeals(suggestions, !draft.replace); setProposing(false); setNotice("Menu saved. You can swap any dinner below."); }}>Use these {preview.length} dinners</button>
+        <button type="button" className="addbtn" onClick={() => changeSuggestions({ variation: draft.variation + 1 })}>Try other suggestions</button></div>
     </section>}
     <p role="status" className="shopping-status">{notice}</p>
     {meals.length > 0 && !pending.length && <p className="week-success">All your dinners are cooked. <button type="button" className="week-reset" onClick={() => navigateWeek(shiftWeek(week, 1))}>Plan next week →</button></p>}

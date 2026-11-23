@@ -20,14 +20,16 @@ export default function RecipeDetail({ recipes }) {
     );
   }
 
-  if (searchParams.get("cook") === "1") return <CookingCard key={`${week}:${recipe.id}`} recipe={recipe} onClose={() => setSearchParams({})} />;
+  if (searchParams.get("cook") === "1") return <CookingCard key={`${week}:${recipe.id}`} recipe={recipe} onClose={() => { const next = new URLSearchParams(searchParams); next.delete("cook"); setSearchParams(next); }} />;
 
   const color = CUISINE_COLOR[recipe.cuisine];
   const added = selected.has(recipe.id);
+  const fromSuggestions = searchParams.get("from") === "suggestions";
+  const suggestionCount = searchParams.get("count") === "4" ? 4 : 5;
 
   return (
     <article className="detail">
-      <Link to={added ? "/week" : "/recipes"} className="backlink">← {added ? "This week's recipes" : "Back to the recipe bank"}</Link>
+      <Link to={fromSuggestions || added ? "/week" : "/recipes"} className="backlink">← {fromSuggestions ? `Back to the ${suggestionCount} suggestions` : added ? "This week's recipes" : "Back to the recipe bank"}</Link>
       <div className="detail-media">
         <RecipeImage key={recipe.image} recipe={recipe} className="detail-image" />
         {recipe.imageSource === "ai" && <span className="image-credit">AI-generated image</span>}
@@ -46,16 +48,18 @@ export default function RecipeDetail({ recipes }) {
         <span className="m">⏱ {recipe.time} min</span>
         <span className="m">~{recipe.kcal} kcal</span>
         <span className="m">Serves {recipe.servings}</span>
+        {recipe.cookingMethod && <span className="m">{recipe.cookingMethod} · {recipe.cookingMethod === "One pot" ? "Hob" : "Oven"}</span>}
         <span className="m"><SpiceDots level={recipe.spice} /></span>
       </div>
       <p className="recipe-note">Calories are estimates per serving. Choose plain staples and check ingredient labels for unnecessary additives.</p>
 
       <button type="button" className={`addbtn detail-addbtn ${added ? "added" : ""}`} onClick={() => toggle(recipe.id)}>
-        {added ? "✓ Added to shopping list" : "+ Add to shopping list"}
+        {added ? "✓ In this week's menu" : "+ Add to this week"}
       </button>
       {added && <label className="cooked-toggle detail-cooked"><input type="checkbox" checked={completed.has(recipe.id)} onChange={() => toggleCompleted(recipe.id)} /> I've cooked this meal</label>}
 
-      <div className="recipe-card-actions"><button type="button" className="primary-action" onClick={() => setSearchParams({ cook: "1" })}>Start cooking →</button><button type="button" className="addbtn" onClick={() => window.print()}>Print recipe card</button></div>
+      {fromSuggestions && <p><Link to="/week">Continue choosing from your {suggestionCount} suggestions →</Link></p>}
+      <div className="recipe-card-actions"><button type="button" className="primary-action" onClick={() => { const next = new URLSearchParams(searchParams); next.set("cook", "1"); setSearchParams(next); }}>Start cooking →</button><button type="button" className="addbtn" onClick={() => window.print()}>Print recipe card</button></div>
 
       <div className="detail-grid">
         <section>

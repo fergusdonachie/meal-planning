@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
 import RecipeCard from "../components/RecipeCard";
 import FilterBar from "../components/FilterBar";
+import { matchesCookingMethod } from "../lib/recipeFilters";
 
-const INITIAL_FILTERS = { cuisine: new Set(), protein: new Set(), time: null, search: "" };
+const INITIAL_FILTERS = { cuisine: new Set(), protein: new Set(), time: null, search: "", cookingMethod: "" };
 
 export default function Home({ recipes }) {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
 
   const filtered = useMemo(() => {
     return recipes.filter((r) => {
+      if (!matchesCookingMethod(r, filters.cookingMethod)) return false;
       if (filters.cuisine.size && !filters.cuisine.has(r.cuisine)) return false;
       if (filters.protein.size) {
         const wants = [...filters.protein];
@@ -55,6 +57,7 @@ export default function Home({ recipes }) {
         filters={filters}
         onToggleCuisine={(c) => toggleSet("cuisine", c)}
         onToggleProtein={(p) => toggleSet("protein", p)}
+        onSetCookingMethod={(cookingMethod) => setFilters((prev) => ({ ...prev, cookingMethod }))}
         onSetTime={(t) => setFilters((prev) => ({ ...prev, time: prev.time === t ? null : t }))}
         onSearch={(v) => setFilters((prev) => ({ ...prev, search: v }))}
         onReset={() => setFilters(INITIAL_FILTERS)}
