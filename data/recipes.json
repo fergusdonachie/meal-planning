@@ -1343,7 +1343,9 @@
       "Gently fold in the drained sardines and heat through for 3–4 minutes, breaking into large flakes.",
       "Toss in the pasta, parsley, lemon zest and enough pasta water to loosen the sauce. Add lemon juice to taste.",
       "Divide between two plates and serve the rocket alongside."
-    ]
+    ],
+    "image": "images/med-sardine-pasta.webp",
+    "imageSource": "ai"
   },
   {
     "id": "med-chicken-white-beans",
@@ -1375,7 +1377,9 @@
       "Add the onion and cook gently for 6 minutes, adding a splash of water if needed. Stir in garlic and rosemary for 1 minute.",
       "Add the tomatoes, drained beans and 100ml water. Return the chicken and any juices, cover and simmer for 10–12 minutes until the chicken is cooked through.",
       "Stir in the spinach and wilt for 2 minutes. Finish with lemon zest and a squeeze of juice, then divide between two bowls."
-    ]
+    ],
+    "image": "images/med-chicken-white-beans.webp",
+    "imageSource": "ai"
   },
   {
     "id": "med-lentil-feta-peppers",
@@ -1408,7 +1412,9 @@
       "Bake for another 15–20 minutes until the peppers are tender and the filling is piping hot.",
       "Meanwhile, cook the bulgur according to its packet, drain if needed and fluff with a fork. Stir in lemon zest, juice to taste and the remaining parsley.",
       "Serve two pepper halves per person on the bulgur."
-    ]
+    ],
+    "image": "images/med-lentil-feta-peppers.webp",
+    "imageSource": "ai"
   },
   {
     "id": "per-cod-herb-rice",
@@ -1442,7 +1448,9 @@
       "Heat the remaining oil in a non-stick frying pan. Cook the cod for 3–5 minutes per side, depending on thickness, until opaque and flaking easily.",
       "Toss the cucumber and tomatoes with lime juice and a little dill.",
       "Fold the remaining dill into the rice. Serve the fish over the rice with the salad alongside."
-    ]
+    ],
+    "image": "images/per-cod-herb-rice.webp",
+    "imageSource": "ai"
   },
   {
     "id": "per-chicken-apricot",
@@ -1477,7 +1485,9 @@
       "Cover and simmer gently for 20–25 minutes, stirring occasionally, until the chicken is cooked through and the carrots are tender. Add a splash of water if it becomes dry.",
       "Meanwhile, cook the rice according to its packet and drain if needed.",
       "Stir lemon juice to taste into the stew, scatter with parsley and serve with the rice."
-    ]
+    ],
+    "image": "images/per-chicken-apricot.webp",
+    "imageSource": "ai"
   },
   {
     "id": "per-aubergine-split-peas",
@@ -1512,7 +1522,9 @@
       "Add the split peas, tomatoes and 500ml water. Bring to the boil, then simmer partly covered for 35–40 minutes, or until the peas are tender. Older peas may take longer; add water as needed.",
       "Cook the rice according to its packet. Fold the roasted aubergine into the stew and simmer for 3 minutes.",
       "Finish the stew with lemon juice and mint, then serve with the rice."
-    ]
+    ],
+    "image": "images/per-aubergine-split-peas.webp",
+    "imageSource": "ai"
   },
   {
     "id": "asi-sesame-haddock",
@@ -1546,7 +1558,9 @@
       "Lay the haddock in the sauce. Surround with carrots and pak choi stalks, cover and simmer gently for 7–10 minutes until the fish is opaque and flakes easily.",
       "Add the pak choi leaves for the final 2 minutes. Lift the fish onto warm plates.",
       "Toss the noodles with the vegetables, pan juices and remaining sesame oil. Serve with the fish, sesame seeds and lime wedges."
-    ]
+    ],
+    "image": "images/asi-sesame-haddock.webp",
+    "imageSource": "ai"
   },
   {
     "id": "asi-beef-basil",
@@ -1581,7 +1595,9 @@
       "Break up the beef and cook for 6–8 minutes until cooked through. Add the pepper and beans and stir-fry for 3 minutes.",
       "Add the soy sauce, fish sauce and 2 tbsp water. Stir for 1 minute, then remove from the heat and fold in the basil.",
       "Serve over rice with lime wedges."
-    ]
+    ],
+    "image": "images/asi-beef-basil.webp",
+    "imageSource": "ai"
   },
   {
     "id": "asi-tofu-peanut-noodles",
@@ -1616,7 +1632,9 @@
       "Whisk the peanut butter with soy sauce, ginger, lime juice and 3–4 tbsp warm noodle water to make a pourable dressing.",
       "Add the cabbage and carrots to the tofu pan and stir-fry for 3 minutes, keeping some crunch.",
       "Toss the noodles with the tofu, vegetables and dressing. Scatter with spring onions and coriander."
-    ]
+    ],
+    "image": "images/asi-tofu-peanut-noodles.webp",
+    "imageSource": "ai"
   },
   {
     "id": "mex-salmon-rice",
@@ -1651,7 +1669,9 @@
       "Mix the tomatoes, onion, half the coriander and lime juice to make a salsa.",
       "Drain the rice if needed and stir in lime zest and the remaining coriander.",
       "Serve the salmon over the bean rice with salsa and salad leaves."
-    ]
+    ],
+    "image": "images/mex-salmon-rice.webp",
+    "imageSource": "ai"
   },
   {
     "id": "mex-chicken-lime-soup",
@@ -1687,7 +1707,9 @@
       "Meanwhile, slice the tortillas into strips. Spread on a tray and bake for 6–8 minutes until crisp, watching closely.",
       "Lift the chicken onto a clean board and shred with two forks. Return to the pan with the beans and sweetcorn and simmer for 5 minutes until piping hot.",
       "Finish with lime juice and coriander. Serve in two bowls with the tortilla strips on top."
-    ]
+    ],
+    "image": "images/mex-chicken-lime-soup.webp",
+    "imageSource": "ai"
   },
   {
     "id": "mex-beef-courgette",
@@ -1723,6 +1745,8 @@
       "Add the beef and cook for 6–8 minutes, breaking it up until cooked through. Stir in garlic, chilli, cumin and paprika for 1 minute.",
       "Add the courgette, tomatoes, drained beans and 100ml water. Simmer for 15–20 minutes until the courgette is tender and the sauce has thickened.",
       "Finish with lime juice to taste. Serve over rice with a spoonful of yoghurt on each portion."
-    ]
+    ],
+    "image": "images/mex-beef-courgette.webp",
+    "imageSource": "ai"
   }
 ]

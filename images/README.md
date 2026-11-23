@@ -1,6 +1,6 @@
 # Recipe images
 
-All 36 current recipes have an individual AI-generated illustrative photograph,
+All 48 current recipes have an individual AI-generated illustrative photograph,
 created with the built-in image generation tool. They are not photographs of
 kitchen-tested results. The app labels them “AI-generated image”.
 
