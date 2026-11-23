@@ -49,11 +49,11 @@ export default function App() {
   return (
     <ShoppingProvider>
       <div className="wrap">
-        {!cooking && <AppNavigation onShopping={() => setModalOpen(true)} />}
+        {!cooking && <AppNavigation />}
         <Routes>
           <Route path="/" element={<Navigate to="/week" replace />} />
           <Route path="/recipes" element={<Home recipes={recipes} />} />
-          <Route path="/week" element={<Week recipes={recipes} onShopping={() => setModalOpen(true)} />} />
+          <Route path="/week" element={<Week recipes={recipes} />} />
           <Route path="/recipe/:id" element={<RecipeDetail recipes={recipes} />} />
         </Routes>
         {!cooking && <footer className="app-footer"><span>The Weekly Table · Your household</span>{import.meta.env.PROD && <form action="/auth/logout" method="post" className="logout-form"><button type="submit">Sign out</button></form>}</footer>}

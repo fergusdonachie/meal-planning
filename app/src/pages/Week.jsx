@@ -5,12 +5,12 @@ import { useShopping } from "../context/ShoppingContext";
 import { currentWeek, shiftWeek, suggestMeals, weekLabel } from "../lib/weeklyMenu";
 import { matchesCookingMethod } from "../lib/recipeFilters";
 
-export default function Week({ recipes, onShopping }) {
+export default function Week({ recipes }) {
   const { week } = useShopping();
-  return <WeekView key={week} recipes={recipes} onShopping={onShopping} />;
+  return <WeekView key={week} recipes={recipes} />;
 }
 
-function WeekView({ recipes, onShopping }) {
+function WeekView({ recipes }) {
   const { selected, completed, toggleCompleted, clear, week, weeks, changeWeek, setMeals, swapMeal, selectMeal, restoreMeals } = useShopping();
   const [params, setParams] = useSearchParams();
   const requestedView = params.get("view");
@@ -143,7 +143,6 @@ function WeekView({ recipes, onShopping }) {
         <button type="button" className="week-reset" onClick={() => setConfirmReset(false)}>Keep menu</button>
       </div>}
       {!meals.length && <section className="menu-empty"><h2>No meals chosen yet</h2><p>Start with four or five ideas, or choose your own from the recipe bank.</p><Link className="primary-action" to="/week?view=ideas">Choose meal ideas →</Link></section>}
-      {meals.length > 0 && <div className="menu-next-step"><p><strong>{meals.length} meals in your menu.</strong> Your shopping list is ready.</p><button type="button" className="primary-action" onClick={onShopping}>Open shopping list →</button></div>}
       {meals.length > 0 && !pending.length && <p className="week-success">All your dinners are cooked. <button type="button" className="week-reset" onClick={() => navigateWeek(shiftWeek(week, 1))}>Plan next week →</button></p>}
       {pending.length > 0 && <section aria-labelledby="pending-meals"><h2 id="pending-meals">Ready to cook <small>{pending.length}</small></h2><div className="grid">{pending.map(renderCard)}</div></section>}
       {cooked.length > 0 && <section className="cooked-meals" aria-labelledby="cooked-meals"><h2 id="cooked-meals">Cooked <small>{cooked.length}</small></h2><div className="grid">{cooked.map(renderCard)}</div></section>}
