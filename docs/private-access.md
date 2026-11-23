@@ -37,10 +37,10 @@ tokens are not stored in browser storage. Removing an allowed email or rotating
 
 1. Create a Supabase project. Enable its email authentication provider. Set its
    **Site URL** to `https://fd-meal-planner.vercel.app` (no trailing slash).
-2. Add the two household users as confirmed users in Supabase Auth. The app sends
-   OTP requests with `create_user: false`, so it never signs up new people.
-   Disable public user sign-ups in Supabase. Use the dashboard's Add User flow or
-   its server-only admin API; the household will never type a password into this app.
+2. Add the two household users using **Add user → Send invitation** in Supabase Auth
+   after configuring the email templates and sender below. This needs no user
+   passwords. The app sends OTP requests with `create_user: false`, so it never
+   signs up new people. Disable public user sign-ups in Supabase.
 3. Configure a working SMTP sender in Supabase, and verify delivery to both
    approved addresses. Supabase's default email sender restricts recipients and
    is unsuitable as a general production delivery service. Never put SMTP secrets
@@ -51,6 +51,16 @@ tokens are not stored in browser storage. Removing an allowed email or rotating
    <h2>Your household table</h2>
    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Open The Weekly Table</a></p>
    ```
+
+   Also edit **Invite user** to use the same destination with `type=invite`:
+
+   ```html
+   <h2>Your household table</h2>
+   <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite">Join our table</a></p>
+   ```
+
+   Invitations are one-time links verified against the same household allowlist.
+   Recovery links and other token types cannot create an app session.
 
    Set an appropriate short OTP expiry, such as 15 minutes. Disable email-provider
    click tracking, which can rewrite sign-in links. The app displays a confirmation

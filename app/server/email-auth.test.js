@@ -84,3 +84,18 @@ test('all assets remain protected, provider failures stay private, and logout cl
   const logout = await protectEmailRequest(post('/auth/logout', {}), env);
   assert.match(logout.headers.get('set-cookie'), /Max-Age=0/);
 });
+
+
+test('one-time invitations use the same household checks without a user password', async () => {
+  const landing = await protectEmailRequest(request('/auth/confirm?type=invite&token_hash=' + token), env, async () => { throw new Error('GET must not verify'); });
+  assert.equal(landing.status, 200);
+  assert.match(await landing.text(), /name="type" value="invite"/);
+  const verify = async (_url, options) => {
+    assert.deepEqual(JSON.parse(options.body), { token_hash: token, type: 'invite' });
+    return Response.json({ user: { email: 'two@example.com', email_confirmed_at: '2026-11-23T12:00:00Z' } });
+  };
+  assert.equal((await protectEmailRequest(post('/auth/confirm', { token_hash: token, type: 'invite' }), env, verify)).status, 303);
+  for (const type of ['recovery', 'signup', '<script>']) {
+    assert.equal((await protectEmailRequest(post('/auth/confirm', { token_hash: token, type }), env, async () => { throw new Error('invalid type must not verify'); })).status, 400);
+  }
+});

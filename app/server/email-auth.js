@@ -50,6 +50,7 @@ function loginPage() {
 async function provider(path, body, env, fetcher) {
   return fetcher(`${env.SUPABASE_URL.replace(/\/$/, '')}/auth/v1/${path}`, { method: 'POST', headers: { apikey: env.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(10000), redirect: 'error' });
 }
+const validLinkType = (value) => ['email', 'invite'].includes(value);
 const validToken = (value) => typeof value === 'string' && /^[a-zA-Z0-9_-]{20,256}$/.test(value);
 
 export async function protectEmailRequest(request, env, fetcher = fetch) {
@@ -59,9 +60,10 @@ export async function protectEmailRequest(request, env, fetcher = fetch) {
   if (path === '/auth/login' && request.method === 'GET') return loginPage();
   if (path === '/auth/confirm' && request.method === 'GET') {
     const token = url.searchParams.get('token_hash');
-    if (!validToken(token) || url.searchParams.get('type') !== 'email') return page('<p>This sign-in link is incomplete. Request a fresh link.</p><a href="/auth/login">Get a new link</a>', 400);
+    const type = url.searchParams.get('type');
+    if (!validToken(token) || !validLinkType(type)) return page('<p>This sign-in link is incomplete. Request a fresh link.</p><a href="/auth/login">Get a new link</a>', 400);
     // Email scanners can visit this page without consuming the one-time link.
-    return page(`<p>Open your private household table on this device.</p><form action="/auth/confirm" method="post"><input type="hidden" name="token_hash" value="${escape(token)}"><button type="submit">Continue to our table</button></form><small>Continue only if you requested this sign-in link.</small>`);
+    return page(`<p>Open your private household table on this device.</p><form action="/auth/confirm" method="post"><input type="hidden" name="token_hash" value="${escape(token)}"><input type="hidden" name="type" value="${type}"><button type="submit">Continue to our table</button></form><small>Continue only if you requested this sign-in link.</small>`);
   }
   if (['/auth/login', '/auth/confirm', '/auth/logout'].includes(path)) {
     if (request.method !== 'POST') return reply('Method not allowed', 405, { Allow: path === '/auth/logout' ? 'POST' : 'GET, POST' });
@@ -80,9 +82,10 @@ export async function protectEmailRequest(request, env, fetcher = fetch) {
       return page('<p role="status">If this is an approved household address, a sign-in link should arrive shortly. Check your inbox and junk folder.</p><p>Use the newest email. If it does not arrive, wait a minute before trying again.</p><a href="/auth/login">Request another link</a>');
     }
     const token = form.get('token_hash');
-    if (!validToken(token)) return page('<p>This sign-in link is invalid.</p><a href="/auth/login">Get a new link</a>', 400);
+    const type = form.get('type') || 'email';
+    if (!validToken(token) || !validLinkType(type)) return page('<p>This sign-in link is invalid.</p><a href="/auth/login">Get a new link</a>', 400);
     try {
-      const result = await provider('verify', { token_hash: token, type: 'email' }, env, fetcher);
+      const result = await provider('verify', { token_hash: token, type }, env, fetcher);
       const data = result.ok ? await result.json() : null;
       if (!data?.user?.email_confirmed_at || !allowed(data.user.email, env)) return page('<p>This link has expired, has already been used, or is not for this household.</p><a href="/auth/login">Get a new link</a>', 401);
       return reply(null, 303, { Location: '/week', 'Set-Cookie': `${COOKIE}=${createEmailSession(data.user.email, env)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}` });
