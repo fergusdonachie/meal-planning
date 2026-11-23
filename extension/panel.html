@@ -1,35 +1,27 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Weekly Table</title><link rel="stylesheet" href="panel.css"></head>
 <body>
-<header><p class="eyebrow">Morrisons companion</p><h1>The Weekly Table</h1><p>Shop your weekly ingredients alongside Morrisons.</p></header>
-<section class="import-tools" aria-label="Import shopping list">
-  <button id="open-planner">Open meal planner</button>
-  <label class="file-button">Import shopping-list file<input id="import-file" type="file" accept=".json,application/json"></label>
-  <p class="hint">In your meal planner, open the shopping list and choose “Send to Morrisons extension”.</p>
-</section>
+<header><p class="eyebrow">The Weekly Table</p><h1>Shop with Morrisons</h1></header>
 <p id="status" role="status" aria-live="polite"></p>
-<p id="progress"></p>
+<section id="empty"><h2>Bring your list over</h2><p>In the meal planner, tick ingredients you already have, then choose “Send to Morrisons extension”.</p><button id="open-planner" class="primary">Open meal planner</button></section>
 <section id="shopping" hidden>
- <section id="batch-section" aria-labelledby="batch-title">
-  <h2 id="batch-title">Add the whole shop</h2>
-  <p class="hint">Let the companion find products, then review the complete proposed basket. The batch makes sure the basket contains at least those totals; it never removes existing items.</p>
-  <button id="auto-match" class="primary">Find products for the whole list</button>
-  <p class="hint">Searches every remaining ingredient and proposes products and pack counts for one basket review. You can change any proposal.</p>
-  <button id="prepare-batch">Review saved choices only</button>
-  <div id="batch-review"></div>
-  <div id="batch-progress" role="status" aria-live="polite"></div>
-  <div class="actions"><button id="pause-batch" hidden>Pause batch</button><button id="resume-batch" hidden>Resume batch</button><button id="discard-batch" class="quiet" hidden>Finish this batch</button></div>
+ <div class="list-progress"><p id="progress"></p><a href="#list-details">View list ↓</a></div>
+ <section id="current" aria-labelledby="required">
+  <p id="position" class="eyebrow"></p><h2 id="required" tabindex="-1"></h2>
+  <form id="search-form"><label for="query">Search term — edit if needed</label><div class="search"><input id="query" maxlength="300" required><button id="search" type="submit">Search Morrisons</button></div></form>
+  <p class="hint">Choose a product below or add it on the Morrisons page. Check the pack size and quantity before moving on.</p>
+  <button id="scan" class="quiet">Refresh products from the open page</button>
+  <div id="results" aria-live="polite"></div>
+  <div class="step-actions"><button id="next" class="primary">Added it — next item →</button><button id="skip" class="quiet">Skip for now</button></div>
  </section>
- <label for="ingredient">Ingredient to shop for</label><select id="ingredient"></select>
- <p id="required" class="required"></p>
- <form id="search-form"><label for="query">Morrisons search</label><div class="search"><input id="query" maxlength="300" required><button type="submit">Search</button></div></form>
- <div id="preferred"></div>
- <button id="scan" class="primary">Read products on this page</button>
- <p class="hint">Log into Morrisons and select your delivery address/slot first. “Add available” describes the page now; Morrisons confirms final delivery availability.</p>
- <div id="results"></div>
-
- <h2>Your ingredient checklist</h2><div id="checklist"></div>
+ <section id="finished" hidden><h2>List complete</h2><p>All ingredients are checked off. Review your basket and delivery details in Morrisons.</p></section>
+ <details id="list-details" open><summary>Your shopping list</summary><div id="checklist"></div></details>
 </section>
-<footer><button id="clear-list" class="quiet">Clear imported list</button><p>Stored in this browser only. No grocery API fees, password collection or automatic checkout.</p></footer>
+<details class="setup"><summary>List tools & help</summary>
+ <p class="hint">Sign in to Morrisons and choose your delivery details before shopping. The extension uses the products and basket controls on the open page.</p>
+ <label class="file-button">Import shopping-list file<input id="import-file" type="file" accept=".json,application/json"></label>
+ <button id="clear-list" class="quiet">Clear imported list</button>
+ <p class="hint">Progress is saved in this browser. Importing a new list starts a new shop.</p>
+</details>
 <script type="module" src="panel.js"></script>
 </body></html>

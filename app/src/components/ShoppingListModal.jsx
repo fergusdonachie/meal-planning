@@ -120,7 +120,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
     setSending(true);
     try {
       const result = await sendShoppingListToExtension(extensionShoppingList(sections));
-      setStatus(result.ok ? `${result.count} ingredients sent. Open the extension from your browser toolbar, then shop in Morrisons.` : result.error || "The extension could not import the list.");
+      setStatus(result.ok ? `${result.count} ingredients sent. Open the extension from your browser toolbar, check the first search term, then choose Search Morrisons.` : result.error || "The extension could not import the list.");
     } catch {
       setStatus("The extension could not import the list. Try the shopping-list file instead.");
     } finally { setSending(false); }
@@ -133,7 +133,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
         <h2 id="shopping-title">Your weekly shopping list</h2>
         <p className="recipe-note">{weekLabel(week)}</p>
         {items.length === 0 ? <p className="empty">Your menu is empty. Close this list and choose some meal ideas first.</p> : <>
-          <p className="sub">{items.length} meals · {view === "combined" ? combined.length : remaining} ingredients to buy. Untick anything you already have.</p>
+          <p className="sub">{items.length} meals · {view === "combined" ? combined.length : remaining} ingredients to buy. Tick anything you already have to leave it out.</p>
           <div className="shopping-handoff">
             <label className="supermarket-choice">Your supermarket
               <select value={storeId} onChange={(event) => { setStoreId(event.target.value); setStatus(""); }}>
@@ -147,6 +147,16 @@ export default function ShoppingListModal({ recipes, onClose }) {
               <a href={store.home} target="_blank" rel="noopener noreferrer">Open {store.name} ↗</a>
             </div>
           </div>
+          {storeId === "morrisons" && <div className="extension-handoff">
+            <h3>Ready to shop in Morrisons?</h3>
+            <p>Tick ingredients you already have below, then send the remaining list. The extension helps you choose products one ingredient at a time.</p>
+            <button type="button" className="primary-action" disabled={!remaining || sending} onClick={sendToExtension}>{sending ? "Sending…" : "Send to Morrisons extension"}</button>
+            <details className="shopping-extras"><summary>Install or update the extension</summary><div className="shopping-actions">
+              <a href="/downloads/weekly-table-morrisons.zip" download>Download extension v0.4 ↧</a>
+              <a href="/downloads/morrisons-extension-setup.txt" target="_blank" rel="noopener noreferrer">Setup & update instructions ↗</a>
+              <button type="button" className="addbtn" disabled={!remaining} onClick={() => downloadShoppingList(extensionShoppingList(sections))}>Download list instead</button>
+            </div></details>
+          </div>}
           <details className="shopping-extras"><summary>More shopping options</summary>
             <div className="store-search">
               <label htmlFor="store-query">Adjust a search for alternatives or hard-to-find ingredients</label>
@@ -155,16 +165,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
                 {query.trim() && <a href={supermarketSearchUrl(storeId, query)} target="_blank" rel="noopener noreferrer">Search {store.name} ↗</a>}
               </div>
             </div>
-          {storeId === "morrisons" && <div className="extension-handoff">
-            <h3>Shop with the Morrisons browser companion</h3>
-            <p>On a laptop or PC, send the combined list to the extension to choose products, save favourites and read current product details.</p>
-            <div className="shopping-actions">
-              <button type="button" className="addbtn" disabled={!remaining || sending} onClick={sendToExtension}>{sending ? "Sending…" : "Send to Morrisons extension"}</button>
-              <button type="button" className="addbtn" disabled={!remaining} onClick={() => downloadShoppingList(extensionShoppingList(sections))}>Shopping-list file</button>
-              <a href="/downloads/weekly-table-morrisons.zip" download>Download extension ↧</a>
-              <a href="/downloads/morrisons-extension-setup.txt" target="_blank" rel="noopener noreferrer">Setup instructions ↗</a>
-            </div>
-          </div>}
+
             <p className="recipe-note">Quantities serve {items.every((recipe) => recipe.servings === 2) ? "two per recipe" : "the number shown for each recipe"}. Repeated ingredients are totalled; different measures stay visible together. Tin amounts use the labelled tin size.</p>
           </details>
           <p className="shopping-status" role="status">{status}</p>
@@ -173,7 +174,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
             <button type="button" className="addbtn" aria-pressed={view === "combined"} onClick={() => changeView("combined")}>Combined list</button>
             <button type="button" className="addbtn" aria-pressed={view === "recipes"} onClick={() => changeView("recipes")}>By recipe</button>
           </div>
-          {remaining === 0 && <p className="empty">Everything is marked as already in your kitchen. Tick an ingredient to add it back.</p>}
+          {remaining === 0 && <p className="empty">Everything is marked as already in your kitchen. Untick an ingredient to add it back.</p>}
           {view === "combined" ? allSections.map((section) => <section className="shopping-section" key={section.id} aria-labelledby={`section-${section.id}`}>
             <h3 id={`section-${section.id}`}>{section.title}</h3>
             <ul className="ingredient-checklist combined-list">
@@ -182,7 +183,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
               const included = Boolean(needed);
               const titles = [...new Set(entry.sources.map((source) => source.recipeTitle))];
               return <li key={entry.key} className={included ? "" : "in-pantry"}>
-                <label><input type="checkbox" checked={included} onChange={() => toggleCombined(entry)} />
+                <label><input type="checkbox" checked={!included} aria-label={`Already have: ${needed?.label || entry.label}`} onChange={() => toggleCombined(entry)} />
                   <span>{needed?.label || entry.label}<small>{titles.join(" · ")}</small></span>
                 </label>
                 {included && <a className="ingredient-shop" href={supermarketSearchUrl(storeId, ingredientSearchTerm(needed.name))} target="_blank" rel="noopener noreferrer" aria-label={`Search ${store.name} for ${needed.name}`}>Search ↗</a>}
@@ -197,7 +198,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
                   const key = ingredientKey(recipe, ingredient);
                   const included = !excluded.has(key);
                   return <li key={ingredient} className={included ? "" : "in-pantry"}>
-                    <label><input type="checkbox" checked={included} onChange={() => toggleIngredient(key)} /> <span>{ingredient}</span></label>
+                    <label><input type="checkbox" checked={!included} aria-label={`Already have: ${ingredient}`} onChange={() => toggleIngredient(key)} /> <span>{ingredient}</span></label>
                     {included && <a className="ingredient-shop" href={supermarketSearchUrl(storeId, ingredientSearchTerm(ingredient))} target="_blank" rel="noopener noreferrer" aria-label={`Search ${store.name} for ${ingredientSearchTerm(ingredient)}`}>Search ↗</a>}
                   </li>;
                 })}

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseHTML } from 'linkedom';
-import { readMorrisonsPage, requestAddOnePack, collectMorrisonsResults } from '../product-reader.js';
+import { readMorrisonsPage } from '../product-reader.js';
 const fixture = readFileSync(new URL('./fixtures/morrisons-search.html', import.meta.url), 'utf8');
 function page(html = fixture) {
   globalThis.document = parseHTML(html).document;
@@ -33,28 +33,6 @@ test('disabled, missing and out-of-stock controls never imply availability', () 
   assert.equal(readMorrisonsPage().products[0].availability, 'unavailable');
 });
 
-test('reviewed add clicks only the exact product once and reports a request, not success', () => {
-  page();
-  const cards = [...document.querySelectorAll('.product-card-container')];
-  let clicks = 0;
-  cards[1].querySelector('button').click = () => { clicks++; };
-  cards[0].querySelector('button').click = () => { throw new Error('Wrong product clicked'); };
-  const result = requestAddOnePack('https://groceries.morrisons.com/products/morrisons-basmati-rice-1kg/104544029');
-  assert.equal(clicks, 1);
-  assert.equal(result.requested, true);
-  assert.match(result.message, /Check Morrisons/);
-});
-
-test('add refuses missing, disabled and unrelated products without a fallback click', () => {
-  page();
-  const target = document.querySelectorAll('.product-card-container')[1].querySelector('button');
-  target.setAttribute('aria-disabled', 'true');
-  target.click = () => { throw new Error('Disabled click'); };
-  assert.throws(() => requestAddOnePack('https://groceries.morrisons.com/products/morrisons-basmati-rice-1kg/104544029'), /not currently available/);
-  assert.throws(() => requestAddOnePack('https://groceries.morrisons.com/products/missing/123'), /no longer on the page/);
-  assert.throws(() => requestAddOnePack('https://evil.example/products/rice/123'), /Invalid/);
-});
-
 test('missing site selectors return no products and unrelated origins are refused', () => {
   page('<h1>Sign in</h1><input type="password" value="never-read-me">');
   assert.deepEqual(readMorrisonsPage().products, []);
@@ -73,6 +51,7 @@ test('Morrisons quantity and increment selectors identify existing basket quanti
   const plus = document.createElement('button'); plus.setAttribute('data-test', 'counter:increment'); card.append(plus);
   assert.equal(inspectBasketProduct(targetUrl).quantity, 2);
   assert.equal(inspectBasketProduct(targetUrl).canIncrease, true);
+  assert.equal(readMorrisonsPage().products.find((product) => product.url === targetUrl).canAdd, true);
   plus.setAttribute('aria-disabled', 'true');
   assert.equal(inspectBasketProduct(targetUrl).canIncrease, false);
 });
@@ -96,44 +75,4 @@ test('a click with no quantity acknowledgement times out without retrying', asyn
   document.querySelectorAll('.product-card-container')[1].querySelector('button').click = () => { clicks++; };
   const result = await increaseBasketProduct(targetUrl, 0, 50);
   assert.equal(clicks, 1); assert.equal(result.confirmed, false);
-});
-
-function scrollingPage() {
-  page(`<html><body>${fixture}</body></html>`);
-  const cards = [...document.querySelectorAll('.product-card-container')];
-  const holder = cards[0].parentNode;
-  cards.forEach((card) => card.remove()); holder.append(cards[0]);
-  Object.defineProperty(document.documentElement, 'scrollHeight', { value: 1800 });
-  let index = 0;
-  globalThis.window = {
-    scrollY: 0, innerHeight: 600,
-    scrollBy(_x, y) {
-      this.scrollY = Math.min(1200, this.scrollY + y);
-      if (index < cards.length - 1) { cards[index].remove(); holder.append(cards[++index]); }
-    },
-    scrollTo(_x, y) { this.scrollY = y; },
-  };
-  return cards;
-}
-
-test('scroll reader retains earlier cards when later results replace them', async () => {
-  scrollingPage();
-  const result = await collectMorrisonsResults(null, { pauseMs: 1, maxScrolls: 10, timeoutMs: 1000 });
-  assert.equal(result.products.length, 3);
-  assert.equal(result.truncated, false);
-  assert.equal(window.scrollY, 0);
-});
-
-test('target lookup scrolls to a later card and leaves it mounted for adding', async () => {
-  scrollingPage();
-  const result = await collectMorrisonsResults(targetUrl, { pauseMs: 1, maxScrolls: 10, timeoutMs: 1000 });
-  assert.equal(result.targetFound, true);
-  assert.ok(window.scrollY > 0);
-  assert.equal(inspectBasketProduct(targetUrl).found, true);
-});
-
-test('scroll reader reports a bounded scan instead of claiming complete results', async () => {
-  scrollingPage();
-  const result = await collectMorrisonsResults(null, { pauseMs: 1, maxScrolls: 1, timeoutMs: 1000 });
-  assert.equal(result.truncated, true);
 });

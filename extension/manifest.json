@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "The Weekly Table — Morrisons companion",
-  "version": "0.3.0",
-  "description": "Shop your weekly ingredients alongside Morrisons, save preferred products and inspect current page availability.",
+  "version": "0.4.0",
+  "description": "Shop your weekly ingredients one at a time alongside Morrisons. Review each search, choose products and move through your list.",
   "minimum_chrome_version": "116",
   "permissions": ["storage", "scripting", "sidePanel"],
   "host_permissions": ["https://groceries.morrisons.com/*", "https://fd-meal-planner.vercel.app/*"],
