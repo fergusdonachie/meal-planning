@@ -2,7 +2,8 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const COOKIE = '__Host-weeklyTable';
 const SESSION_SECONDS = 90 * 24 * 60 * 60;
-const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff', 'X-Robots-Tag': 'noindex, nofollow' };
+// Keep token-bearing paths out of referrers without making form POST Origins null.
+const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'strict-origin', 'X-Content-Type-Options': 'nosniff', 'X-Robots-Tag': 'noindex, nofollow' };
 const normalize = (email) => typeof email === 'string' ? email.trim().toLowerCase() : '';
 const allowlist = (env) => [...new Set((env.APP_ALLOWED_EMAILS || '').split(',').map(normalize).filter(Boolean))].sort();
 const authKey = (env) => env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY;

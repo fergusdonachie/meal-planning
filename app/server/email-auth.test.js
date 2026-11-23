@@ -35,10 +35,23 @@ test('GET confirmation does not consume the link; verification is same-origin PO
   const result = await protectEmailRequest(request('/auth/confirm?type=email&token_hash=' + token), env, fetcher);
   assert.equal(calls, 0);
   assert.match(await result.text(), /Continue to our table/);
-  assert.equal(result.headers.get('referrer-policy'), 'no-referrer');
+  assert.equal(result.headers.get('referrer-policy'), 'strict-origin');
   const crossSite = new Request(origin + '/auth/confirm', { method: 'POST', headers: { origin: 'https://elsewhere.example' } });
   assert.equal((await protectEmailRequest(crossSite, env, fetcher)).status, 403);
   assert.equal(calls, 0);
+});
+
+test('sign-in forms preserve browser POST origins while rejecting missing and opaque origins', async () => {
+  const login = await protectEmailRequest(request('/auth/login'), env);
+  assert.equal(login.headers.get('referrer-policy'), 'strict-origin');
+  for (const path of ['/auth/login', '/auth/confirm', '/auth/logout']) {
+    for (const headers of [{}, { origin: 'null' }, { origin: 'https://elsewhere.example' }]) {
+      const result = await protectEmailRequest(request(path, { method: 'POST', headers }), env, async () => {
+        assert.fail('untrusted origin must not reach the provider');
+      });
+      assert.equal(result.status, 403);
+    }
+  }
 });
 
 test('confirmed household identity earns a private session; invalid or unapproved identities do not', async () => {
