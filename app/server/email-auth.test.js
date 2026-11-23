@@ -99,3 +99,16 @@ test('one-time invitations use the same household checks without a user password
     assert.equal((await protectEmailRequest(post('/auth/confirm', { token_hash: token, type }), env, async () => { throw new Error('invalid type must not verify'); })).status, 400);
   }
 });
+
+
+test('modern publishable keys work without legacy anon keys', async () => {
+  const modern = { ...env, SUPABASE_ANON_KEY: undefined, SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test-key-for-household' };
+  let called = false;
+  const result = await protectEmailRequest(post('/auth/login', { email: 'one@example.com' }), modern, async (_url, options) => {
+    called = true;
+    assert.equal(options.headers.apikey, modern.SUPABASE_PUBLISHABLE_KEY);
+    return new Response('{}');
+  });
+  assert.equal(result.status, 200);
+  assert.equal(called, true);
+});

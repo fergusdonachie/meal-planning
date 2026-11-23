@@ -71,7 +71,7 @@ tokens are not stored in browser storage. Removing an allowed email or rotating
    | --- | --- |
    | `APP_ALLOWED_EMAILS` | The two approved addresses, separated by a comma. No addresses are committed to GitHub. |
    | `SUPABASE_URL` | The project's HTTPS base URL. |
-   | `SUPABASE_ANON_KEY` | Its public legacy anon key, used by the server for Auth requests. A service-role key is not needed by the app. |
+   | `SUPABASE_PUBLISHABLE_KEY` | Its publishable API key, used by the server for Auth requests. A secret/service-role key is not needed. `SUPABASE_ANON_KEY` remains supported for legacy configurations. |
    | `APP_SESSION_SECRET` | Keep the existing independent secret of at least 32 characters, or rotate it to revoke all sessions. |
    | `APP_AUTH_MODE` | Set to `email` only when the provider and delivery tests are ready. |
 

@@ -5,12 +5,13 @@ const SESSION_SECONDS = 90 * 24 * 60 * 60;
 const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff', 'X-Robots-Tag': 'noindex, nofollow' };
 const normalize = (email) => typeof email === 'string' ? email.trim().toLowerCase() : '';
 const allowlist = (env) => [...new Set((env.APP_ALLOWED_EMAILS || '').split(',').map(normalize).filter(Boolean))].sort();
+const authKey = (env) => env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY;
 const allowed = (email, env) => allowlist(env).includes(normalize(email));
 function configured(env) {
   try {
     const url = new URL(env.SUPABASE_URL);
     return url.protocol === 'https:' && !url.username && !url.password && url.pathname === '/' && !url.search && !url.hash
-      && typeof env.SUPABASE_ANON_KEY === 'string' && env.SUPABASE_ANON_KEY.length >= 20
+      && typeof authKey(env) === 'string' && authKey(env).length >= 20
       && typeof env.APP_SESSION_SECRET === 'string' && env.APP_SESSION_SECRET.length >= 32
       && allowlist(env).length > 0 && allowlist(env).every((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
   } catch { return false; }
@@ -48,7 +49,7 @@ function loginPage() {
   return page(`<p>Your recipes. Your week. Just your household.</p><form action="/auth/login" method="post"><label for="email">Your email address</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254" autofocus><button type="submit">Email me a sign-in link</button></form><small>Only approved household addresses can sign in. No password to remember. You'll stay signed in on this device for up to 90 days.</small>`);
 }
 async function provider(path, body, env, fetcher) {
-  return fetcher(`${env.SUPABASE_URL.replace(/\/$/, '')}/auth/v1/${path}`, { method: 'POST', headers: { apikey: env.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(10000), redirect: 'error' });
+  return fetcher(`${env.SUPABASE_URL.replace(/\/$/, '')}/auth/v1/${path}`, { method: 'POST', headers: { apikey: authKey(env), 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(10000), redirect: 'error' });
 }
 const validLinkType = (value) => ['email', 'invite'].includes(value);
 const validToken = (value) => typeof value === 'string' && /^[a-zA-Z0-9_-]{20,256}$/.test(value);
