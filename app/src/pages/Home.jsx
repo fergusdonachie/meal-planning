@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useShopping } from "../context/ShoppingContext";
+import { weekLabel } from "../lib/weeklyMenu";
 import RecipeCard from "../components/RecipeCard";
 import FilterBar from "../components/FilterBar";
 import { matchesCookingMethod } from "../lib/recipeFilters";
@@ -6,7 +9,17 @@ import { matchesCookingMethod } from "../lib/recipeFilters";
 const INITIAL_FILTERS = { cuisine: new Set(), protein: new Set(), time: null, search: "", cookingMethod: "" };
 
 export default function Home({ recipes }) {
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const { week } = useShopping();
+  const [filters, setFilters] = useState(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("weeklyTableRecipeFilters"));
+      if (saved) return { ...INITIAL_FILTERS, ...saved, cuisine: new Set(saved.cuisine), protein: new Set(saved.protein) };
+    } catch { /* Filters are optional. */ }
+    return INITIAL_FILTERS;
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem("weeklyTableRecipeFilters", JSON.stringify({ ...filters, cuisine: [...filters.cuisine], protein: [...filters.protein] })); } catch { /* Filters are optional. */ }
+  }, [filters]);
 
   const filtered = useMemo(() => {
     return recipes.filter((r) => {
@@ -35,21 +48,14 @@ export default function Home({ recipes }) {
     });
   }
 
-  const avgTime = Math.round(recipes.reduce((a, r) => a + r.time, 0) / recipes.length);
-  const fishCount = recipes.filter((r) => r.fish).length;
-
   return (
     <>
       <header className="top">
         <div className="titleblock">
-          <p className="eyebrow">Recipe bank · Mediterranean · Persian · Asian · Mexican</p>
-          <h1>The Weekly Table</h1>
-          <p>Quick, from-scratch dinners for two, with fresh herbs, whole spices and homemade curry bases. Choose plain staples, work fish into the week, then shop your ingredients at your favourite supermarket.</p>
-        </div>
-        <div className="headline-stats">
-          <div><span className="n">{recipes.length}</span><span className="l">Recipes</span></div>
-          <div><span className="n">{fishCount}</span><span className="l">Fish dishes</span></div>
-          <div><span className="n">{avgTime}</span><span className="l">Avg. min</span></div>
+          <p className="eyebrow">Recipe bank</p>
+          <h1>Find a meal</h1>
+          <p>Open a recipe to take a look, or add it straight to your menu.</p>
+          <p className="planning-week">Adding to <strong>{weekLabel(week)}</strong> · <Link to="/week?view=menu">Change week</Link></p>
         </div>
       </header>
 

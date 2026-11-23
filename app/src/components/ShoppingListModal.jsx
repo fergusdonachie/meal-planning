@@ -48,7 +48,7 @@ export default function ShoppingListModal({ recipes, onClose }) {
     function onKey(event) {
       if (event.key === "Escape") onClose();
       if (event.key !== "Tab") return;
-      const focusable = [...modalRef.current.querySelectorAll('button:not(:disabled), a[href], input, textarea, select')];
+      const focusable = [...modalRef.current.querySelectorAll('button:not(:disabled), a[href], input, textarea, select, summary')].filter((element) => element.getClientRects().length > 0);
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
@@ -132,21 +132,22 @@ export default function ShoppingListModal({ recipes, onClose }) {
         <button type="button" className="close-btn" aria-label="Close shopping list" onClick={onClose}>×</button>
         <h2 id="shopping-title">Your weekly shopping list</h2>
         <p className="recipe-note">{weekLabel(week)}</p>
-        {items.length === 0 ? <p className="empty">Nothing selected yet. Add a few meals from the bank first.</p> : <>
-          <p className="sub">{items.length} recipe{items.length === 1 ? "" : "s"} · {view === "combined" ? combined.length : remaining} ingredient entries to buy. Untick anything you already have. Quantities serve {items.every((recipe) => recipe.servings === 2) ? "two per recipe" : "the number shown for each recipe"}.</p>
+        {items.length === 0 ? <p className="empty">Your menu is empty. Close this list and choose some meal ideas first.</p> : <>
+          <p className="sub">{items.length} meals · {view === "combined" ? combined.length : remaining} ingredients to buy. Untick anything you already have.</p>
           <div className="shopping-handoff">
-            <h3>Shop your ingredients</h3>
             <label className="supermarket-choice">Your supermarket
               <select value={storeId} onChange={(event) => { setStoreId(event.target.value); setStatus(""); }}>
                 {SUPERMARKETS.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
               </select>
             </label>
-            <p>Use the search link beside each needed ingredient to find it in {store.name}. Check pack sizes against your list, then add products in the shop. Search links don’t transfer a basket.</p>
+            <p>Search opens {store.name} for that ingredient. Choose products and add them to your basket there.</p>
             <div className="shopping-actions">
-              <button type="button" className="addbtn" disabled={!remaining} onClick={copyList}>Copy shopping list</button>
+              <button type="button" className="addbtn" disabled={!remaining} onClick={copyList}>Copy list</button>
               <button type="button" className="addbtn" disabled={!remaining} onClick={shareList}>Share list</button>
               <a href={store.home} target="_blank" rel="noopener noreferrer">Open {store.name} ↗</a>
             </div>
+          </div>
+          <details className="shopping-extras"><summary>More shopping options</summary>
             <div className="store-search">
               <label htmlFor="store-query">Adjust a search for alternatives or hard-to-find ingredients</label>
               <div className="shopping-actions">
@@ -154,7 +155,6 @@ export default function ShoppingListModal({ recipes, onClose }) {
                 {query.trim() && <a href={supermarketSearchUrl(storeId, query)} target="_blank" rel="noopener noreferrer">Search {store.name} ↗</a>}
               </div>
             </div>
-          </div>
           {storeId === "morrisons" && <div className="extension-handoff">
             <h3>Shop with the Morrisons browser companion</h3>
             <p>On a laptop or PC, send the combined list to the extension to choose products, save favourites and read current product details.</p>
@@ -165,13 +165,14 @@ export default function ShoppingListModal({ recipes, onClose }) {
               <a href="/downloads/morrisons-extension-setup.txt" target="_blank" rel="noopener noreferrer">Setup instructions ↗</a>
             </div>
           </div>}
+            <p className="recipe-note">Quantities serve {items.every((recipe) => recipe.servings === 2) ? "two per recipe" : "the number shown for each recipe"}. Repeated ingredients are totalled; different measures stay visible together. Tin amounts use the labelled tin size.</p>
+          </details>
           <p className="shopping-status" role="status">{status}</p>
           {manualCopy && <textarea ref={copyRef} className="copy-list" aria-label="Shopping list to copy" readOnly value={text} rows={8} />}
           <div className="shopping-view" role="group" aria-label="Shopping list view">
             <button type="button" className="addbtn" aria-pressed={view === "combined"} onClick={() => changeView("combined")}>Combined list</button>
             <button type="button" className="addbtn" aria-pressed={view === "recipes"} onClick={() => changeView("recipes")}>By recipe</button>
           </div>
-          <p className="recipe-note">{view === "combined" ? "Repeated ingredients are totalled. Different measures stay visible together; alternatives and unclear amounts are kept as written. Tin amounts refer to the labelled tin size." : "Ingredients and quantities for each selected recipe."}</p>
           {remaining === 0 && <p className="empty">Everything is marked as already in your kitchen. Tick an ingredient to add it back.</p>}
           {view === "combined" ? allSections.map((section) => <section className="shopping-section" key={section.id} aria-labelledby={`section-${section.id}`}>
             <h3 id={`section-${section.id}`}>{section.title}</h3>

@@ -1,25 +1,15 @@
 import { useShopping } from "../context/ShoppingContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { weekLabel } from "../lib/weeklyMenu";
 
-export default function ShoppingBar({ recipes, onView }) {
-  const { selected } = useShopping();
-  const n = selected.size;
-  if (n === 0) return null;
-
-  const fishCount = [...selected].filter((id) => recipes.find((r) => r.id === id)?.fish).length;
-
-  return (
-    <div className="shopbar">
-      <div className="shopbar-inner">
-        <div className="sinfo">
-          <span><b>{n}</b> meal{n > 1 ? "s" : ""} selected</span>
-          <span className="fishnote">
-            {fishCount > 0 ? `${fishCount} fish meal${fishCount > 1 ? "s" : ""} included` : "No fish selected yet — aim for at least one"}
-          </span>
-        </div>
-        <Link className="week-bar-link" to="/week">Open weekly menu →</Link>
-        <button type="button" className="viewbtn" onClick={onView}>View shopping list</button>
-      </div>
-    </div>
-  );
+export default function ShoppingBar({ onView }) {
+  const { selected, week } = useShopping();
+  const location = useLocation();
+  if (!selected.size) return null;
+  const onMenu = location.pathname === "/week" && new URLSearchParams(location.search).get("view") !== "ideas";
+  return <div className="shopbar"><div className="shopbar-inner">
+    <div className="sinfo"><span><b>{selected.size}</b> meal{selected.size === 1 ? "" : "s"} in your menu</span><span className="fishnote">{weekLabel(week)}</span></div>
+    {!onMenu && <Link className="week-bar-link" to="/week?view=menu">View menu →</Link>}
+    <button type="button" className="viewbtn" onClick={onView}>Shopping list</button>
+  </div></div>;
 }

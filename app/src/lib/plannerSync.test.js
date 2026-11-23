@@ -61,3 +61,18 @@ test('an expired login keeps unsent work and signals sign-in rather than claimin
   assert.equal(store.getSnapshot().status, 'signed-out');
   assert.equal(JSON.parse(local.getItem(SYNC_KEY)).pending.length, 1);
 });
+test('undo can restore cooked meals explicitly without accidentally toggling them off', async () => {
+  const db = server(), phone = create(db), mac = create(db);
+  phone.start(); mac.start(); await wait(phone); await wait(mac);
+  phone.dispatch({ type: 'replace', ids: ['fish-pie', 'tofu-curry'] });
+  phone.dispatch({ type: 'complete', id: 'fish-pie', value: true });
+  phone.dispatch({ type: 'complete', id: 'fish-pie', value: true });
+  await wait(phone);
+  assert.deepEqual(db.weeks[week].completed, ['fish-pie']);
+  phone.dispatch({ type: 'clear' }); await wait(phone);
+  phone.dispatch({ type: 'replace', ids: ['fish-pie', 'tofu-curry'] });
+  phone.dispatch({ type: 'complete', id: 'fish-pie', value: true }); await wait(phone);
+  await mac.refresh();
+  assert.deepEqual([...mac.getSnapshot().planner.weeks[week].selected], ['fish-pie', 'tofu-curry']);
+  assert.deepEqual([...mac.getSnapshot().planner.weeks[week].completed], ['fish-pie']);
+});

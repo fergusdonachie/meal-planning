@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import RecipeImage from "../components/RecipeImage";
 import { useShopping } from "../context/ShoppingContext";
 import { currentWeek, shiftWeek, suggestMeals, weekLabel } from "../lib/weeklyMenu";
@@ -11,7 +11,11 @@ export default function Week({ recipes, onShopping }) {
 }
 
 function WeekView({ recipes, onShopping }) {
-  const { selected, completed, toggleCompleted, clear, week, weeks, changeWeek, setMeals, swapMeal } = useShopping();
+  const { selected, completed, toggleCompleted, clear, week, weeks, changeWeek, setMeals, swapMeal, selectMeal, restoreMeals } = useShopping();
+  const [params, setParams] = useSearchParams();
+  const requestedView = params.get("view");
+  const view = ["menu", "ideas"].includes(requestedView) ? requestedView : selected.size ? "menu" : "ideas";
+  function showView(next) { setParams({ view: next }, { replace: true }); }
   const draftKey = `weeklyTableSuggestions:${week}`;
   function buildDraft(options) {
     const pool = recipes.filter((recipe) => matchesCookingMethod(recipe, options.onePan ? "single" : ""));
@@ -22,21 +26,35 @@ function WeekView({ recipes, onShopping }) {
       const saved = JSON.parse(sessionStorage.getItem(draftKey));
       if ([4, 5].includes(saved?.count) && Array.isArray(saved.ids) && saved.ids.length && saved.ids.every((id) => recipes.some((recipe) => recipe.id === id))) return saved;
     } catch { /* Start a new draft if browser storage is unavailable. */ }
-    return buildDraft({ count: 5, variation: 0, onePan: false, open: false, replace: false });
+    return buildDraft({ count: 5, variation: 0, onePan: false });
   });
   useEffect(() => { try { sessionStorage.setItem(draftKey, JSON.stringify(draft)); } catch { /* Navigation still works without saved suggestions. */ } }, [draftKey, draft]);
-  const { count, onePan, ids: suggestions, open: proposing } = draft;
-  function setProposing(open) { setDraft((previous) => ({ ...previous, open, replace: open ? selected.size > 0 : previous.replace })); }
+  const { count, onePan, ids: suggestions } = draft;
   function changeSuggestions(changes) { setDraft((previous) => buildDraft({ ...previous, ...changes })); }
-  function openSuggestion() {
-    const next = { ...draft, open: true };
-    // Persist before Link navigation unmounts this screen and cancels its effect.
-    try { sessionStorage.setItem(draftKey, JSON.stringify(next)); } catch { /* Optional browser storage. */ }
-    setDraft(next);
-  }
   const [swapping, setSwapping] = useState(null);
+  const [replacement, setReplacement] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
   const [notice, setNotice] = useState("");
+  const [undo, setUndo] = useState(null);
+  const [confirmReplace, setConfirmReplace] = useState(false);
+  function removeRecipe(recipe) {
+    showView(view);
+    setUndo({ ids: [recipe.id], cooked: completed.has(recipe.id) ? [recipe.id] : [], kind: "remove" });
+    selectMeal(recipe.id, false);
+    setNotice(`${recipe.title} removed from your menu.`);
+  }
+  function acceptIdeas() {
+    setUndo({ ids: [...selected], cooked: [...completed], kind: "reset" });
+    setMeals(suggestions, true);
+    setConfirmReplace(false);
+    showView("menu");
+    setNotice("Menu ready. Your shopping list includes these meals.");
+  }
+  function undoChange() {
+    if (undo.kind === "remove") restoreMeals([...selected, ...undo.ids], [...completed, ...undo.cooked]);
+    else restoreMeals(undo.ids, undo.cooked);
+    setUndo(null); setNotice("Your menu has been restored.");
+  }
   const meals = [...selected].map((id) => recipes.find((recipe) => recipe.id === id)).filter(Boolean);
   const pending = meals.filter((recipe) => !completed.has(recipe.id));
   const cooked = meals.filter((recipe) => completed.has(recipe.id));
@@ -46,45 +64,43 @@ function WeekView({ recipes, onShopping }) {
     return Number(b.protein === original?.protein) - Number(a.protein === original?.protein) || a.time - b.time || a.title.localeCompare(b.title);
   });
 
-  function navigateWeek(next) { changeWeek(next); }
+  function navigateWeek(next) { setParams({}, { replace: true }); changeWeek(next); }
   function renderCard(recipe) {
     const done = completed.has(recipe.id);
     return <article className={`card week-card ${done ? "cooked" : ""}`} key={recipe.id}>
-      <Link className="card-media-link" to={`/recipe/${recipe.id}`}>
+      <Link className="card-media-link" to={`/recipe/${recipe.id}?from=week`}>
         <RecipeImage recipe={recipe} />
         {recipe.imageSource === "ai" && <span className="image-credit">AI-generated image</span>}
         {done && <span className="cooked-badge">✓ Cooked</span>}
       </Link>
       <div className="card-body">
-        <h3><Link to={`/recipe/${recipe.id}`}>{recipe.title}</Link></h3>
+        <h3><Link to={`/recipe/${recipe.id}?from=week`}>{recipe.title}</Link></h3>
         <p className="blurb">{recipe.blurb}</p>
         <p className="week-meta">{recipe.time} min · Serves {recipe.servings} · {recipe.cuisine}</p>
         <div className="week-card-actions">
-          <Link className="addbtn cook-link" to={`/recipe/${recipe.id}?cook=1`}>Start cooking</Link>
-          {!done && <button type="button" className="week-reset" onClick={() => setSwapping(swapping === recipe.id ? null : recipe.id)}>Swap meal</button>}
+          <Link className="addbtn cook-link" to={`/recipe/${recipe.id}?from=week&cook=1`}>Start cooking</Link>
+          {!done && <button type="button" className="week-reset" onClick={() => { setSwapping(swapping === recipe.id ? null : recipe.id); setReplacement(""); }}>Swap meal</button>}
+          <button type="button" className="week-reset" onClick={() => removeRecipe(recipe)}>Remove<span className="sr-only"> {recipe.title}</span></button>
           <label className="cooked-toggle"><input type="checkbox" checked={done} onChange={() => toggleCompleted(recipe.id)} /> Cooked</label>
         </div>
         {swapping === recipe.id && <div className="swap-picker">
           <label htmlFor={`swap-${recipe.id}`}>Choose a replacement</label>
-          <select id={`swap-${recipe.id}`} defaultValue="" onChange={(event) => {
-            if (!event.target.value) return;
-            swapMeal(recipe.id, event.target.value); setSwapping(null); setNotice("Meal swapped. Your shopping list has been updated.");
-          }}>
+          <select id={`swap-${recipe.id}`} value={replacement} onChange={(event) => setReplacement(event.target.value)}>
             <option value="" disabled>Select a recipe…</option>
             {swapOptions.map((option) => <option key={option.id} value={option.id}>{option.title} · {option.time} min · {option.protein}</option>)}
           </select>
-          <button type="button" className="week-reset" onClick={() => setSwapping(null)}>Cancel</button>
+          <div className="swap-actions"><button type="button" className="addbtn" disabled={!replacement} onClick={() => {
+            swapMeal(recipe.id, replacement); setSwapping(null); setUndo(null); setNotice("Meal swapped. Your shopping list has been updated.");
+          }}>Swap this meal</button><button type="button" className="week-reset" onClick={() => setSwapping(null)}>Cancel</button></div>
         </div>}
       </div>
     </article>;
   }
 
   return <>
-    <header className="top">
-      <div className="titleblock"><p className="eyebrow">Your household table</p><h1>{week === currentWeek() ? "This week's dinners" : "Your weekly dinners"}</h1>
-        <p>Four or five dinners, a little variety, and room to change your mind. Open a cooking card when it's time to eat.</p>
-      </div>
-      {meals.length > 0 && <div className="week-progress"><strong>{cooked.length} of {meals.length} cooked</strong><progress value={cooked.length} max={meals.length} aria-label="Meals cooked this week" /></div>}
+    <header className="top week-heading">
+      <div className="titleblock"><h1>Your weekly menu</h1></div>
+      {view === "menu" && meals.length > 0 && <div className="week-progress"><strong>{cooked.length} of {meals.length} cooked</strong><progress value={cooked.length} max={meals.length} aria-label="Meals cooked this week" /></div>}
     </header>
     <div className="week-calendar" aria-label="Choose a week">
       <button type="button" className="addbtn" onClick={() => navigateWeek(shiftWeek(week, -1))} aria-label="Previous week">←</button>
@@ -92,38 +108,45 @@ function WeekView({ recipes, onShopping }) {
       <button type="button" className="addbtn" onClick={() => navigateWeek(shiftWeek(week, 1))} aria-label="Next week">→</button>
       {week !== currentWeek() && <button type="button" className="week-reset" onClick={() => navigateWeek(currentWeek())}>Back to this week</button>}
     </div>
-    <div className="week-toolbar">
-      <Link className="addbtn cook-link" to="/recipes">Browse recipe bank</Link>
-      {meals.length > 0 && <>
-        <button type="button" className="addbtn" onClick={onShopping}>Shopping list</button>
-        <button type="button" className="addbtn" onClick={() => setProposing(!proposing)}>{proposing ? "Keep my menu" : "Suggest a different menu"}</button>
-        <button type="button" className="week-reset" onClick={() => setConfirmReset(true)}>Clear this week</button>
-      </>}
-    </div>
-    {confirmReset && <div className="week-reset-confirm" role="group" aria-label="Clear this week">
-      <p>Clear this week's meals and cooked ticks? Other weeks stay saved.</p>
-      <button type="button" className="addbtn" onClick={() => { clear(); setConfirmReset(false); }}>Clear menu</button>
-      <button type="button" className="week-reset" onClick={() => setConfirmReset(false)}>Keep menu</button>
-    </div>}
-    {(!meals.length || proposing) && <section className="menu-proposal" aria-labelledby="suggested-menu">
-      <div className="proposal-heading"><div><p className="eyebrow">A starting point for your week</p><h2 id="suggested-menu">How about these dinners?</h2></div>
-        <label>Dinners <select value={count} onChange={(event) => changeSuggestions({ count: Number(event.target.value) })}><option value={4}>4 dinners</option><option value={5}>5 dinners</option></select></label>
+    <nav className="weekly-views" aria-label="Weekly views">
+      <Link to="/week?view=menu" aria-current={view === "menu" ? "page" : undefined}>Your menu <span>{meals.length}</span></Link>
+      <Link to="/week?view=ideas" aria-current={view === "ideas" ? "page" : undefined}>Meal ideas</Link>
+    </nav>
+    <div className="menu-feedback" role="status" hidden={!notice}>{notice} {undo && <button type="button" className="week-reset" onClick={undoChange}>Undo</button>}</div>
+    {view === "ideas" ? <section className="menu-proposal" aria-labelledby="suggested-menu">
+      <div className="proposal-heading"><div><h2 id="suggested-menu">Pick meals for your week</h2><p>Add meals individually, or use the whole set.</p></div>
+        <label>Suggest <select value={count} onChange={(event) => { setConfirmReplace(false); changeSuggestions({ count: Number(event.target.value) }); }}><option value={4}>4 meals</option><option value={5}>5 meals</option></select></label>
       </div>
-      <label className="single-vessel-choice"><input type="checkbox" checked={onePan} onChange={(event) => changeSuggestions({ onePan: event.target.checked })} /> One pot / one tray meals only</label>
-      <p>{onePan ? "Complete dinners cooked in one pot on the hob or one roasting tray in the oven. Fish, chicken and vegetarian choices where available." : "Fish, chicken and vegetarian choices across the cuisines you enjoy. Suggestions favour meals under 40 minutes and avoid last week's choices where possible."}</p>
+      <label className="single-vessel-choice"><input type="checkbox" checked={onePan} onChange={(event) => { setConfirmReplace(false); changeSuggestions({ onePan: event.target.checked }); }} /> One pot / one tray only</label>
       <ol className="suggested-meals">{preview.map((recipe) => <li key={recipe.id}>
-        <RecipeImage recipe={recipe} className="suggestion-photo" />
-        <div><Link to={`/recipe/${recipe.id}?from=suggestions&count=${count}`} onClick={openSuggestion}>{recipe.title}</Link><small>{recipe.time} min · {recipe.protein} · {recipe.cookingMethod || recipe.cuisine}{selected.has(recipe.id) ? " · ✓ Added to this week" : ""}</small></div>
+        <Link to={`/recipe/${recipe.id}?from=suggestions`} tabIndex={-1} aria-hidden="true"><RecipeImage recipe={recipe} className="suggestion-photo" /></Link>
+        <div className="suggestion-info"><Link to={`/recipe/${recipe.id}?from=suggestions`}>{recipe.title}</Link><small>{recipe.time} min · {recipe.protein} · {recipe.cookingMethod || recipe.cuisine}</small><Link className="recipe-preview" to={`/recipe/${recipe.id}?from=suggestions`}>View recipe</Link></div>
+        {selected.has(recipe.id) ? <div className="suggestion-choice"><span className="menu-membership">✓ In your menu</span><button type="button" className="week-reset" onClick={() => removeRecipe(recipe)}>Remove<span className="sr-only"> {recipe.title}</span></button></div> : <button type="button" className="addbtn" onClick={() => { showView("ideas"); selectMeal(recipe.id, true); setNotice(`${recipe.title} added to your menu.`); setUndo(null); }}>Add to week<span className="sr-only">: {recipe.title}</span></button>}
       </li>)}</ol>
-      <p className="recipe-note">Recipe pictures are AI-generated illustrations.</p>
-      {meals.length > 0 && draft.replace && <p className="recipe-note">Using these suggestions replaces this week's menu and resets its cooked ticks.</p>}
-      <div className="shopping-actions"><button type="button" className="primary-action" onClick={() => { setMeals(suggestions, !draft.replace); setProposing(false); setNotice("Menu saved. You can swap any dinner below."); }}>Use these {preview.length} dinners</button>
-        <button type="button" className="addbtn" onClick={() => changeSuggestions({ variation: draft.variation + 1 })}>Try other suggestions</button></div>
-    </section>}
-    <p role="status" className="shopping-status">{notice}</p>
-    {meals.length > 0 && !pending.length && <p className="week-success">All your dinners are cooked. <button type="button" className="week-reset" onClick={() => navigateWeek(shiftWeek(week, 1))}>Plan next week →</button></p>}
-    {pending.length > 0 && <section aria-labelledby="pending-meals"><h2 id="pending-meals">Still to cook <small>{pending.length}</small></h2><div className="grid">{pending.map(renderCard)}</div></section>}
-    {cooked.length > 0 && <section className="cooked-meals" aria-labelledby="cooked-meals"><h2 id="cooked-meals">Cooked this week <small>{cooked.length}</small></h2><div className="grid">{cooked.map(renderCard)}</div></section>}
-    <p className="recipe-note">Your household shares weekly menus and cooked ticks. Updates appear on your other devices when you open the app, or within a few seconds while it’s open.</p>
+      <div className="shopping-actions"><button type="button" className="primary-action" onClick={() => { if ([...selected].some((id) => !suggestions.includes(id))) setConfirmReplace(true); else acceptIdeas(); }}>Use all {preview.length} meals</button>
+        <button type="button" className="addbtn" onClick={() => { setConfirmReplace(false); changeSuggestions({ variation: draft.variation + 1 }); }}>Show other ideas</button></div>
+      {confirmReplace && <div className="week-reset-confirm" role="group" aria-label="Replace menu">
+        <p>Replace the menu for {weekLabel(week)} with these {preview.length} meals? Cooked ticks stay for any meals you keep.</p>
+        <button type="button" className="addbtn" onClick={acceptIdeas}>Replace menu</button><button type="button" className="week-reset" onClick={() => setConfirmReplace(false)}>Keep my menu</button>
+      </div>}
+      <p className="recipe-note">Recipe images are AI-generated.</p>
+      <p className="ideas-footer">Want something else? <Link to="/recipes">Browse all {recipes.length} recipes →</Link></p>
+    </section> : <>
+      <div className="week-toolbar">
+        <Link className="addbtn" to="/week?view=ideas">Add meal ideas</Link>
+        <Link className="addbtn" to="/recipes">Browse recipes</Link>
+        {meals.length > 0 && <button type="button" className="week-reset" onClick={() => setConfirmReset(true)}>Reset week</button>}
+      </div>
+      {confirmReset && <div className="week-reset-confirm" role="group" aria-label="Reset week">
+        <p>Remove all meals and cooked ticks for {weekLabel(week)}? Other weeks stay saved.</p>
+        <button type="button" className="addbtn" onClick={() => { setUndo({ ids: [...selected], cooked: [...completed], kind: "reset" }); clear(); setConfirmReset(false); setNotice("Week reset. Choose new meals, or undo to restore your menu."); }}>Reset this week</button>
+        <button type="button" className="week-reset" onClick={() => setConfirmReset(false)}>Keep menu</button>
+      </div>}
+      {!meals.length && <section className="menu-empty"><h2>No meals chosen yet</h2><p>Start with four or five ideas, or choose your own from the recipe bank.</p><Link className="primary-action" to="/week?view=ideas">Choose meal ideas →</Link></section>}
+      {meals.length > 0 && <div className="menu-next-step"><p><strong>{meals.length} meals in your menu.</strong> Your shopping list is ready.</p><button type="button" className="primary-action" onClick={onShopping}>Open shopping list →</button></div>}
+      {meals.length > 0 && !pending.length && <p className="week-success">All your dinners are cooked. <button type="button" className="week-reset" onClick={() => navigateWeek(shiftWeek(week, 1))}>Plan next week →</button></p>}
+      {pending.length > 0 && <section aria-labelledby="pending-meals"><h2 id="pending-meals">Ready to cook <small>{pending.length}</small></h2><div className="grid">{pending.map(renderCard)}</div></section>}
+      {cooked.length > 0 && <section className="cooked-meals" aria-labelledby="cooked-meals"><h2 id="cooked-meals">Cooked <small>{cooked.length}</small></h2><div className="grid">{cooked.map(renderCard)}</div></section>}
+    </>}
   </>;
 }

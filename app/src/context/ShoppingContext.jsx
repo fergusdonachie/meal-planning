@@ -28,6 +28,11 @@ export function ShoppingProvider({ children }) {
   return <ShoppingContext.Provider value={{
     selected, completed, week: planner.week, weeks: planner.weeks,
     toggle: (id) => sync.dispatch({ type: "toggle", id }),
+    selectMeal: (id, value) => sync.dispatch({ type: "select", id, value }),
+    restoreMeals: (ids, cooked) => {
+      sync.dispatch({ type: "replace", ids });
+      for (const id of cooked) if (ids.includes(id)) sync.dispatch({ type: "complete", id, value: true });
+    },
     clear: () => sync.dispatch({ type: "clear" }),
     toggleCompleted: (id) => sync.dispatch({ type: "complete", id }),
     changeWeek: sync.changeWeek,

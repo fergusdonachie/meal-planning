@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import { useRecipes } from "./hooks/useRecipes";
@@ -16,6 +16,15 @@ export default function App() {
   const location = useLocation();
   const cooking = location.pathname.startsWith("/recipe/") && new URLSearchParams(location.search).get("cook") === "1";
   const [modalOpen, setModalOpen] = useState(false);
+  const scrollPositions = useRef(new Map());
+  useLayoutEffect(() => {
+    const key = location.pathname + location.search;
+    const browsing = location.pathname === "/week" || location.pathname === "/recipes";
+    window.scrollTo(0, browsing ? scrollPositions.current.get(key) || 0 : 0);
+    const remember = () => scrollPositions.current.set(key, window.scrollY);
+    window.addEventListener("scroll", remember, { passive: true });
+    return () => window.removeEventListener("scroll", remember);
+  }, [location.pathname, location.search, loading]);
 
   if (loading) {
     return (
@@ -40,15 +49,16 @@ export default function App() {
   return (
     <ShoppingProvider>
       <div className="wrap">
-        {!cooking && <AppNavigation />}
+        {!cooking && <AppNavigation onShopping={() => setModalOpen(true)} />}
         <Routes>
           <Route path="/" element={<Navigate to="/week" replace />} />
           <Route path="/recipes" element={<Home recipes={recipes} />} />
           <Route path="/week" element={<Week recipes={recipes} onShopping={() => setModalOpen(true)} />} />
           <Route path="/recipe/:id" element={<RecipeDetail recipes={recipes} />} />
         </Routes>
+        {!cooking && <footer className="app-footer"><span>The Weekly Table · Your household</span>{import.meta.env.PROD && <form action="/auth/logout" method="post" className="logout-form"><button type="submit">Sign out</button></form>}</footer>}
       </div>
-      {!cooking && <ShoppingBar recipes={recipes} onView={() => setModalOpen(true)} />}
+      {!cooking && <ShoppingBar onView={() => setModalOpen(true)} />}
       {modalOpen && <ShoppingListModal recipes={recipes} onClose={() => setModalOpen(false)} />}
     </ShoppingProvider>
   );

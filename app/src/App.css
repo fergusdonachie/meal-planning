@@ -663,3 +663,76 @@ header.top {
 .single-vessel-choice { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-weight: 600; }
 .single-vessel-choice input { width: 20px; height: 20px; accent-color: var(--olive); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* Keep planning, browsing and cooking actions distinct. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.app-navigation .nav-shopping { font: inherit; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; background: var(--paper); cursor: pointer; }
+.weekly-views { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+.weekly-views a { padding: 14px 20px; color: var(--ink-soft); text-decoration: none; font-weight: 700; border-bottom: 3px solid transparent; }
+.weekly-views a[aria-current] { color: var(--olive); border-color: var(--olive); background: var(--olive-soft); border-radius: 9px 9px 0 0; }
+.weekly-views span { margin-left: 6px; }
+.menu-feedback:empty { display: none; }
+.menu-feedback { padding: 12px 16px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.menu-membership { color: var(--olive); font-weight: 700; font-size: 14px; }
+.suggestion-info { flex: 1; min-width: 0; }
+.suggested-meals li { background: var(--paper); padding: 14px; border-radius: 12px; }
+.suggested-meals .recipe-preview { display: inline-block; font-size: 13px; font-weight: 500; margin-top: 8px; }
+.suggestion-choice { display: grid; justify-items: center; }
+.suggested-meals .addbtn { flex: 0 0 auto; width: auto; }
+.ideas-footer { margin: 20px 0 0; }
+.menu-next-step { display: flex; gap: 16px; align-items: center; justify-content: space-between; margin: 0 0 26px; padding: 16px 20px; background: var(--olive-soft); border-radius: 12px; }
+.menu-next-step p { margin: 0; }
+.menu-empty { background: var(--olive-soft); border-radius: 12px; padding: 28px; }
+.menu-empty h2 { margin-top: 0; }
+.menu-empty .primary-action { display: inline-block; text-decoration: none; }
+.recipe-menu-actions { background: var(--olive-soft); border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.recipe-menu-actions p { margin: 0; flex-basis: 100%; }
+.recipe-menu-actions .addbtn { flex: 0 0 auto; width: auto; }
+.recipe-menu-actions .detail-cooked { margin: 0; }
+.recipe-menu-actions > a { margin-left: auto; }
+.planning-week { font-size: 14px; }
+.addrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+@media (max-width: 680px) {
+  .wrap { padding-top: 16px; padding-bottom: 150px; }
+  .app-navigation { gap: 6px; margin-bottom: 20px; }
+  .app-navigation a, .app-navigation .nav-shopping { font-size: 13px; padding: 10px 12px; }
+  .logout-form { flex-basis: 100%; text-align: right; }
+  .logout-form button { padding: 4px 8px; font-size: 12px; }
+  .top { margin-bottom: 20px; }
+  .week-heading .titleblock p:last-child { margin-bottom: 0; }
+  .week-calendar { gap: 8px; }
+  .week-calendar strong { font-size: 16px; }
+  .weekly-views a { flex: 1; text-align: center; padding: 12px; }
+  .suggested-meals li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px 12px; }
+  .suggested-meals .suggestion-photo { width: 64px; height: 64px; }
+  .suggested-meals li > .addbtn, .suggestion-choice { grid-column: 2; justify-self: start; }
+  .suggestion-choice { display: flex; align-items: center; gap: 8px; }
+  .suggestion-choice .week-reset { padding: 8px; }
+  .menu-next-step { align-items: stretch; flex-direction: column; }
+  .recipe-menu-actions > a { margin-left: 0; flex-basis: 100%; }
+  .shopbar-inner { gap: 8px 16px; flex-wrap: wrap; }
+  .shopbar .sinfo { flex: 1 1 50%; }
+  .shopbar .week-bar-link { order: 3; }
+}
+@media print { .recipe-menu-actions, .weekly-views, .menu-feedback { display: none !important; } }
+.swap-actions { display: flex; gap: 10px; margin-top: 12px; }
+.addbtn:disabled { opacity: .5; cursor: not-allowed; }
+.shopping-extras { margin: 16px 0; }
+.shopping-extras summary { cursor: pointer; padding: 10px 0; font-weight: 600; }
+.shopping-extras .store-search { margin-top: 12px; }
+.menu-feedback[hidden] { display: none; }
+header.week-heading { padding-bottom: 0; border: 0; margin-bottom: 16px; }
+.app-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--ink-soft); font-size: 12px; border-top: 1px solid var(--line); margin-top: 32px; padding-top: 16px; }
+.app-footer .logout-form { flex-basis: auto; }
+@media (max-width: 680px) {
+  .household-sync { font-size: 11px; padding: 8px 12px; margin-top: 8px; }
+  .app-navigation { margin-bottom: 18px; }
+  .week-progress { display: flex; align-items: center; gap: 12px; font-size: 12px; width: 100%; }
+  .week-progress progress { max-width: 110px; }
+  .week-calendar { margin-bottom: 12px; }
+  .menu-proposal .proposal-heading p { font-size: 14px; margin: 6px 0; }
+  .menu-proposal .proposal-heading h2 { font-size: 22px; }
+  .menu-proposal .single-vessel-choice { margin: 14px 0; }
+  .shopbar .sinfo { display: grid; gap: 4px; font-size: 11px; }
+}
+@media print { .app-footer { display: none !important; } }

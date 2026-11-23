@@ -67,7 +67,7 @@ export function createPlannerSync({ storage, fetcher = fetch, makeId = () => cry
       const plan = snapshot.planner.weeks[week] || { selected: new Set(), completed: new Set() };
       let op = { ...action, week, operationId: makeId() };
       if (action.type === 'toggle') op = { ...op, type: 'select', value: !plan.selected.has(action.id) };
-      if (action.type === 'complete') op.value = !plan.completed.has(action.id);
+      if (action.type === 'complete' && typeof action.value !== 'boolean') op.value = !plan.completed.has(action.id);
       if (!validOperation(op)) return;
       pending = [...pending, op];
       status = status === 'offline' || status === 'signed-out' ? status : 'saving';
