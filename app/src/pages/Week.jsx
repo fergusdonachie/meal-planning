@@ -99,6 +99,6 @@ export default function Week({ recipes, onShopping }) {
     {meals.length > 0 && !pending.length && <p className="week-success">All your dinners are cooked. <button type="button" className="week-reset" onClick={() => navigateWeek(shiftWeek(week, 1))}>Plan next week →</button></p>}
     {pending.length > 0 && <section aria-labelledby="pending-meals"><h2 id="pending-meals">Still to cook <small>{pending.length}</small></h2><div className="grid">{pending.map(renderCard)}</div></section>}
     {cooked.length > 0 && <section className="cooked-meals" aria-labelledby="cooked-meals"><h2 id="cooked-meals">Cooked this week <small>{cooked.length}</small></h2><div className="grid">{cooked.map(renderCard)}</div></section>}
-    <p className="recipe-note">Weeks and cooked ticks are saved in this browser. They don't sync between phones yet.</p>
+    <p className="recipe-note">Your household shares weekly menus and cooked ticks. Updates appear on your other devices when you open the app, or within a few seconds while it’s open.</p>
   </>;
 }

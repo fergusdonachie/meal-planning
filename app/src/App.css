@@ -645,3 +645,8 @@ header.top {
 .primary-action:disabled { opacity: .6; cursor: default; }
 .cooking-toolbar [aria-pressed="true"] { background: var(--olive); color: var(--cream); }
 .storage-warning { max-width: 1180px; margin: 12px auto; padding: 16px; background: var(--terracotta-soft); color: var(--ink); border-radius: 10px; }
+
+.household-sync { max-width: 1148px; width: calc(100% - 32px); margin: 12px auto 0; padding: .65rem 1rem; border-radius: 10px; background: #edf0e5; color: #43502e; font-size: .88rem; }
+.household-sync.sync-pending { background: #fff1d8; color: #76501d; }
+.household-sync a { color: inherit; font-weight: 700; }
+@media print { .household-sync { display: none; } }

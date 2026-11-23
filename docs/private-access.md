@@ -13,9 +13,34 @@ step. Cooking progress is saved per recipe and week. Screen wake lock is optiona
 and browser-dependent; it is released when leaving the cooking card. Full recipe
 cards can also be printed.
 
-Menus, cooked ticks and cooking progress are stored locally per browser. They do
-not yet sync across phones or computers. Signing into the same household does
-not itself provide data synchronisation.
+Weekly menus and cooked ticks sync through the private Supabase household_weeks
+table. The server checks the signed household session on every API call; the
+browser never receives the database secret key. Ingredient preparation ticks,
+cooking step, supermarket preference and pantry exclusions remain per device.
+
+### Shared menu storage
+
+Apply `supabase/migrations/20261123_household_weeks.sql` in the project's SQL editor.
+Set server-only `SUPABASE_SECRET_KEY` in Vercel Production to the project's secret
+API key (`sb_secret_...`). A legacy `SUPABASE_SERVICE_ROLE_KEY` also works. Never
+prefix this key with VITE_, commit it or put it in chat. Redeploy after configuring
+it. The table has RLS enabled and no access for anon/authenticated database roles;
+only the server's service role can read or update it.
+
+Each browser imports old local menus only for weeks absent from shared storage.
+An existing shared menu, including an intentionally cleared menu, wins over a
+stale local copy. The original weeklyTableWeeks local data stays as a backup.
+Open the device with the menu you want to keep first after upgrading.
+
+Changes are applied immediately and kept in a durable local outbox until the
+server acknowledges them. Updates specify the intended selected/cooked state;
+server revision checks retry concurrent changes without overwriting unrelated
+meals. Operation IDs deduplicate delivery retries. Explicit menu replacement or
+clearing intentionally replaces that week. Offline changes reconcile on reconnect;
+if both devices change the same item, the last applied change wins. Other weeks
+stay independent. Sync runs on open/focus/reconnect and every 15 seconds while
+visible. Status messages distinguish synced, saving, offline and expired login.
+The app caches menus for offline use but does not install an offline app shell.
 
 ## Password-free household access (ready to configure)
 
